@@ -48,6 +48,8 @@
 
 # Include the common Makefile, which will also include the project specific
 # config.mk file.
+
+BUILD_DIR = build/
 MAKEFILE_PATH = ../../asf-3.21.0/common/utils/make/Makefile.avr.in
 include $(MAKEFILE_PATH)
 

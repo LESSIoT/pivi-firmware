@@ -53,7 +53,7 @@ CSRCS = \
        xmega/boards/xmega_a3bu_xplained/init.c            \
        xmega/drivers/nvm/nvm.c                            \
        xmega/drivers/usart/usart.c                        \
-       ../medidor-pivi/firmware/usart_example.c
+       usart_example.c
 
 # Assembler source files located from the top-level source directory
 ASSRCS = \
@@ -74,8 +74,8 @@ INC_PATH = \
        xmega/drivers/pmic                                 \
        xmega/drivers/usart                                \
        xmega/utils                                        \
-       xmega/utils/preprocessor \
-       ../medidor-pivi/firmware/
+       xmega/utils/preprocessor                           \
+       ../medidor-pivi/firmware
 
 # Library paths from the top-level source directory
 LIB_PATH =

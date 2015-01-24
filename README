@@ -1,0 +1,14 @@
+
+In this project we use the Atmel Software Framework, version 3.21.0.6
+
+$ wget http://www.atmel.com/images/asf-standalone-archive-3.21.0.6.zip
+$ md5sum asf-standalone-archive-3.21.0.6.zip
+fc1cb0440882f899c0158331292af757  asf-standalone-archive-3.21.0.6.zip
+
+unzip the asf in the same directory of medidor-pivi repository, so you should
+have this strcutre:
+
+$ ls -l
+drwxr-xr-x 10 diego users      4096 Jan  6 07:31 asf-3.21.0
+-rw-r--r--  1 diego users 294699920 Jan 20 14:55 asf-standalone-archive-3.21.0.6.zip
+drwxr-xr-x 15 diego users      4096 Jan 24 12:58 medidor-pivi

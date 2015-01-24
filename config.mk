@@ -37,7 +37,7 @@
 #
 
 # Path to top level ASF directory relative to this project directory.
-PRJ_PATH = ../../../../../..
+PRJ_PATH = ../../asf-3.21.0
 
 # Microcontroller: atxmega128a1, atmega128, attiny261, etc.
 MCU = atxmega256a3bu
@@ -52,8 +52,8 @@ CSRCS = \
        common/services/ioport/xmega/ioport_compat.c       \
        xmega/boards/xmega_a3bu_xplained/init.c            \
        xmega/drivers/nvm/nvm.c                            \
-       xmega/drivers/usart/example/usart_example.c        \
-       xmega/drivers/usart/usart.c
+       xmega/drivers/usart/usart.c                        \
+       ../medidor-pivi/firmware/usart_example.c
 
 # Assembler source files located from the top-level source directory
 ASSRCS = \
@@ -73,20 +73,19 @@ INC_PATH = \
        xmega/drivers/nvm                                  \
        xmega/drivers/pmic                                 \
        xmega/drivers/usart                                \
-       xmega/drivers/usart/example/atxmega256a3bu_xmega_a3bu_xplained \
        xmega/utils                                        \
        xmega/utils/preprocessor \
-       xmega/drivers/usart/example/atxmega256a3bu_xmega_a3bu_xplained/gcc
+       ../medidor-pivi/firmware/
 
 # Library paths from the top-level source directory
-LIB_PATH = 
+LIB_PATH =
 
 # Libraries to link with the project
-LIBS = 
+LIBS =
 
 # Additional options for debugging. By default the common Makefile.in will
 # add -gdwarf-2.
-DBGFLAGS = 
+DBGFLAGS =
 
 # Optimization settings
 OPTIMIZATION = -Os
@@ -94,20 +93,20 @@ OPTIMIZATION = -Os
 # Extra flags used when creating an EEPROM Intel HEX file. By default the
 # common Makefile.in will add -j .eeprom
 # --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0.
-EEPROMFLAGS = 
+EEPROMFLAGS =
 
 # Extra flags used when creating an Intel HEX file. By default the common
 # Makefile.in will add -R .eeprom -R .usb_descriptor_table.
-FLASHFLAGS = 
+FLASHFLAGS =
 
 # Extra flags to use when archiving.
-ARFLAGS = 
+ARFLAGS =
 
 # Extra flags to use when assembling.
-ASFLAGS = 
+ASFLAGS =
 
 # Extra flags to use when compiling.
-CFLAGS = 
+CFLAGS =
 
 # Extra flags to use when preprocessing.
 #
@@ -125,8 +124,8 @@ CPPFLAGS = \
 
 # Extra flags to use when linking
 LDFLAGS =  \
-       -Wl,--section-start=.BOOT=0x40000                 
+       -Wl,--section-start=.BOOT=0x40000
 
 # Pre- and post-build commands
-PREBUILD_CMD = 
-POSTBUILD_CMD = 
+PREBUILD_CMD =
+POSTBUILD_CMD =

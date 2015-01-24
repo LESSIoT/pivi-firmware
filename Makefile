@@ -48,5 +48,8 @@
 
 # Include the common Makefile, which will also include the project specific
 # config.mk file.
-MAKEFILE_PATH = ../../../../../../common/utils/make/Makefile.avr.in
+MAKEFILE_PATH = ../../asf-3.21.0/common/utils/make/Makefile.avr.in
 include $(MAKEFILE_PATH)
+
+program: all
+	avrdude -c dragon_jtag -p x256a3bu -U flash:w:usart_example.hex:i

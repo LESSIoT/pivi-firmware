@@ -50,6 +50,7 @@
 # config.mk file.
 
 BUILD_DIR = build/
+VERBOSE = 1
 MAKEFILE_PATH = ../../asf-3.21.0/common/utils/make/Makefile.avr.in
 include $(MAKEFILE_PATH)
 

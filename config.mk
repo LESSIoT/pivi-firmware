@@ -53,7 +53,8 @@ CSRCS = \
        xmega/boards/xmega_a3bu_xplained/init.c            \
        xmega/drivers/nvm/nvm.c                            \
        xmega/drivers/usart/usart.c                        \
-       firmware.c
+       firmware.c                                         \
+       communication.c
 
 # Assembler source files located from the top-level source directory
 ASSRCS = \

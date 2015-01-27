@@ -5,3 +5,9 @@ build/
 *.lss
 *.map
 *.sym
+
+
+# Eclipse Project
+.cproject
+.project
+.settings/

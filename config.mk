@@ -44,7 +44,7 @@ MCU = atxmega256a3bu
 
 # Application target name. Given with suffix .a for library and .elf for a
 # standalone application.
-TARGET = usart_example.elf
+TARGET = firmware.elf
 
 # C source files located from the top-level source directory
 CSRCS = \
@@ -53,7 +53,7 @@ CSRCS = \
        xmega/boards/xmega_a3bu_xplained/init.c            \
        xmega/drivers/nvm/nvm.c                            \
        xmega/drivers/usart/usart.c                        \
-       usart_example.c
+       firmware.c
 
 # Assembler source files located from the top-level source directory
 ASSRCS = \

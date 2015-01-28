@@ -77,8 +77,18 @@
 // From module: Part identification macros
 #include <parts.h>
 
+// From module: Sleep Controller driver
+#include <sleep.h>
+
+// From module: Sleep manager - XMEGA A/AU/B/D implementation
+#include <sleepmgr.h>
+#include <xmega/sleepmgr.h>
+
 // From module: System Clock Control - XMEGA A1U/A3U/A3BU/A4U/B/C implementation
 #include <sysclk.h>
+
+// From module: TC - Timer Counter
+#include <tc.h>
 
 // From module: USART - Universal Synchronous/Asynchronous Receiver/Transmitter
 #include <usart.h>

@@ -2,17 +2,15 @@
 #include "conf_board.h"
 #include "sysclk.h"
 #include "communication.h"
+#include "time.h"
 #include "asf.h"
 
 int main(void)
 {
-	/* Initialize the board.
-	 * The board-specific conf_board.h file contains the configuration of
-	 * the board initialization.
-	 */
 	board_init();
 	sysclk_init();
 	communication_init();
+	time_init();
 
 	/* TEST send_to_pi function */
 	measurement_packet_t packet;

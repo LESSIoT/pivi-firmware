@@ -50,11 +50,14 @@ TARGET = firmware.elf
 CSRCS = \
        common/services/clock/xmega/sysclk.c               \
        common/services/ioport/xmega/ioport_compat.c       \
+       common/services/sleepmgr/xmega/sleepmgr.c          \
        xmega/boards/xmega_a3bu_xplained/init.c            \
        xmega/drivers/nvm/nvm.c                            \
+       xmega/drivers/tc/tc.c                              \
        xmega/drivers/usart/usart.c                        \
        firmware.c                                         \
-       communication.c
+       communication.c                                    \
+       time.c
 
 # Assembler source files located from the top-level source directory
 ASSRCS = \
@@ -67,12 +70,15 @@ INC_PATH = \
        common/services/clock                              \
        common/services/gpio                               \
        common/services/ioport                             \
+       common/services/sleepmgr                           \
        common/utils                                       \
        xmega/boards                                       \
        xmega/boards/xmega_a3bu_xplained                   \
        xmega/drivers/cpu                                  \
        xmega/drivers/nvm                                  \
        xmega/drivers/pmic                                 \
+       xmega/drivers/sleep                                \
+       xmega/drivers/tc                                   \
        xmega/drivers/usart                                \
        xmega/utils                                        \
        xmega/utils/preprocessor                           \

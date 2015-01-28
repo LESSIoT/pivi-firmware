@@ -1,7 +1,7 @@
 /**
  * \file
  *
- * \brief Example specific board configuration file
+ * \brief Sleep manager configuration
  *
  * Copyright (c) 2014 Atmel Corporation. All rights reserved.
  *
@@ -43,10 +43,9 @@
  /**
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
-#ifndef CONF_BOARD_H_INCLUDED
-#define CONF_BOARD_H_INCLUDED
+#ifndef CONF_SLEEPMGR_H
+#define CONF_SLEEPMGR_H
 
-#define CONF_BOARD_ENABLE_USARTC0
-#define CONF_BOARD_ENABLE_AC_PINS
+#define CONFIG_SLEEPMGR_ENABLE
 
-#endif /* CONF_BOARD_H_INCLUDED */
+#endif /* CONF_SLEEPMGR_H */

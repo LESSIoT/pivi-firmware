@@ -4,6 +4,7 @@
 #include "communication.h"
 #include "time.h"
 #include "asf.h"
+#include "firmware.h"
 
 int main(void)
 {

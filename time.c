@@ -19,16 +19,40 @@ void time_init(void)
 	pmic_init();
     cpu_irq_enable();
     sleepmgr_init();
-    time_start();
-    configure_timer(I_TIMER);
-    configure_timer(V_TIMER);
 }
 
-
-void time_start(void)
+void time_set_V_callback(tc_callback_t callback)
 {
-	tc_enable(I_TIMER);
-	tc_enable(V_TIMER);
+	tc_set_overflow_interrupt_callback(V_TIMER, callback);
+}
 
-	tc_set_overflow_interrupt_callback(I_TIMER, test_ovf_interrupt_callback);
+void time_set_I_callback(tc_callback_t callback)
+{
+	tc_set_overflow_interrupt_callback(I_TIMER, callback);
+}
+
+void time_start_timers(uint16_t v_delay)
+{
+	tc_enable(V_TIMER);
+	tc_enable(I_TIMER);
+    configure_timer(I_TIMER);
+    configure_timer(V_TIMER);
+    tc_write_period(V_TIMER, v_delay);
+	tc_write_count(V_TIMER, 0);
+	tc_write_count(I_TIMER, 0);
+}
+
+void time_set_V_period(void)
+{
+	tc_write_period(V_TIMER, TIMER_PERIOD);
+}
+
+void time_stop_I_timer(void)
+{
+	tc_disable(I_TIMER);
+}
+
+void time_stop_V_timer(void)
+{
+	tc_disable(V_TIMER);
 }

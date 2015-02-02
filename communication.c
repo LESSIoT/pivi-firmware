@@ -51,6 +51,22 @@ void send_to_pi(const measurement_packet_t *packet)
     usart_putchar(USART_SERIAL, SERIAL_STOP_BYTE);
 }
 
+void debug_to_pi_uint16(const uint16_t c)
+{
+	usart_putchar(USART_SERIAL, (uint8_t) (c>>8));
+	usart_putchar(USART_SERIAL, (uint8_t) (c & 0x00ff));
+	usart_putchar(USART_SERIAL, '\n');
+}
+void debug_to_pi(const char *c)
+{
+	while (*c)
+	{
+		usart_putchar(USART_SERIAL, *c);
+		c++;
+	}
+	usart_putchar(USART_SERIAL, '\n');
+}
+
 uint8_t getchar_from_pi(void)
 {
 	return usart_getchar(USART_SERIAL);

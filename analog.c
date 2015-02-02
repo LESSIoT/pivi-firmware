@@ -1,6 +1,13 @@
 
+#include <adc.h>
+
 #include "analog.h"
 
+#include "mock_signals.h"
+
+circuit_t * _circuit;
+
+uint8_t v_idx = 0, i_idx = 0;
 
 /* internal functions prototypes */
 void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask);
@@ -8,39 +15,43 @@ void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask)
 
 void analog_config(circuit_t *circuit)
 {
-	_channel_config(circuit->v_adc, circuit->v_pin, V_ADC_CH);
-	_channel_config(circuit->i_adc, circuit->i_pin, I_ADC_CH);
+	_circuit = circuit;
+	_channel_config(circuit->V_adc, circuit->V_pin, V_ADC_CH);
+	_channel_config(circuit->I_adc, circuit->I_pin, I_ADC_CH);
 }
 
-float analog_get_v_sample(circuit_t *circuit)
+float analog_get_V_sample(void)
 {
+    return V[v_idx++%1000];
 	uint16_t adc_measure;
 	int16_t signed_measure;
-	adc_enable(circuit->v_adc);
+	adc_enable(_circuit->V_adc);
 
-	adc_start_conversion(circuit->v_adc, V_ADC_CH);
-	adc_wait_for_interrupt_flag(circuit->v_adc, V_ADC_CH);
-	adc_measure = adc_get_result(circuit->v_adc, V_ADC_CH);
+	adc_start_conversion(_circuit->V_adc, V_ADC_CH);
+	adc_wait_for_interrupt_flag(_circuit->V_adc, V_ADC_CH);
+	adc_measure = adc_get_result(_circuit->V_adc, V_ADC_CH);
 
-	signed_measure = adc_measure - circuit->dc_offset;
-	return circuit->v_gain * (signed_measure / (float) (1<<12));
+	signed_measure = adc_measure - _circuit->V_dc_offset;
+	return _circuit->V_gain * (signed_measure / (float) (1<<12));
 }
 
-float analog_get_i_sample(circuit_t *circuit)
+float analog_get_I_sample(void)
 {
+    return I[i_idx++%1000];
 	uint16_t adc_measure;
-	adc_enable(circuit->v_adc);
-	adc_start_conversion(circuit->v_adc, V_ADC_CH);
-	adc_wait_for_interrupt_flag(circuit->v_adc, V_ADC_CH);
+	adc_enable(_circuit->V_adc);
+	adc_start_conversion(_circuit->V_adc, V_ADC_CH);
+	adc_wait_for_interrupt_flag(_circuit->V_adc, V_ADC_CH);
 
-	adc_measure = adc_get_result(circuit->v_adc, V_ADC_CH);
-	return adc_measure * circuit->i_gain;
+	adc_measure = adc_get_result(_circuit->V_adc, V_ADC_CH);
+	return _circuit->I_gain * (adc_measure / (float) (1<<12));
 }
 
 void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask)
 {
 	struct adc_config adc_conf;
 	struct adc_channel_config adcch_conf;
+
 	adc_read_configuration(adc, &adc_conf);
 	adcch_read_configuration(adc, ch_mask, &adcch_conf);
 	adc_set_conversion_parameters(&adc_conf, ADC_SIGN_OFF, ADC_RES_12,
@@ -50,5 +61,4 @@ void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask)
 	adcch_set_input(&adcch_conf, pin, ADCCH_NEG_NONE, 1);
 	adc_write_configuration(adc, &adc_conf);
 	adcch_write_configuration(adc, pin, &adcch_conf);
-
 }

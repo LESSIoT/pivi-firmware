@@ -16,6 +16,8 @@ typedef struct measurement_packet {
 void communication_init(void);
 
 uint8_t getchar_from_pi(void);
+void debug_to_pi_uint16(const uint16_t c);
+void debug_to_pi(const char *c);
 void send_to_pi(const measurement_packet_t *packet);
 
 #endif //_COMMUNICATION_H

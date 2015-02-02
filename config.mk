@@ -53,13 +53,15 @@ CSRCS = \
        common/services/sleepmgr/xmega/sleepmgr.c          \
        xmega/boards/xmega_a3bu_xplained/init.c            \
        xmega/drivers/adc/adc.c                            \
+       xmega/drivers/adc/xmega_aau/adc_aau.c              \
        xmega/drivers/nvm/nvm.c                            \
        xmega/drivers/tc/tc.c                              \
        xmega/drivers/usart/usart.c                        \
        firmware.c                                         \
        communication.c                                    \
        time.c                                             \
-       analog.c
+       analog.c                                           \
+       measurements.c
 
 # Assembler source files located from the top-level source directory
 ASSRCS = \

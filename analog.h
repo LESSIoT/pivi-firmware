@@ -12,7 +12,7 @@
 
 
 void analog_config(circuit_t *circuit);
-float analog_get_v_sample(circuit_t *circuit);
-float analog_get_i_sample(circuit_t *circuit);
+float analog_get_V_sample(void);
+float analog_get_I_sample(void);
 
 #endif /* _ANALOG_H */

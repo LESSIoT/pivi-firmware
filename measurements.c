@@ -16,7 +16,7 @@ uint16_t I_samples_count, V_samples_count;
 
 float I_rms_acc, V_rms_acc, power_acc;
 
-uint8_t measuring;
+volatile uint8_t measuring;
 
 void measure_V_sample(void)
 {
@@ -76,6 +76,7 @@ void measure(circuit_t *circuit)
 
 	/* wait until all the samples are taken */
 	while (measuring);
+
 	debug_to_pi("end measuring");
 
 	packet.circuit_id = circuit->circuit_id;

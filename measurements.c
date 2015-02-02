@@ -5,18 +5,24 @@
 #include "analog.h"
 #include "time.h"
 
-#define N_SAMPLES_BY_PERIOD 5 //20
-#define I_SAMPLES_BUFF_SIZE (N_SAMPLES_BY_PERIOD / 10)
+#define N_SAMPLES_BY_PERIOD 20
+#define I_SAMPLES_BUFF_SIZE (N_SAMPLES_BY_PERIOD / 1)
 #define N_PERIODS 1
 #define N_SAMPLES (N_PERIODS * N_SAMPLES_BY_PERIOD)
 
 
-float I_samples_buffer[I_SAMPLES_BUFF_SIZE];
-uint16_t I_samples_count, V_samples_count;
+volatile float I_samples_buffer[I_SAMPLES_BUFF_SIZE];
+volatile uint16_t I_samples_count, V_samples_count;
 
-float I_rms_acc, V_rms_acc, power_acc;
+volatile float I_rms_acc, V_rms_acc, power_acc;
 
 volatile uint8_t measuring;
+
+
+/* internal functions prototypes */
+void measure_V_sample(void);
+void measure_I_sample(void);
+/***/
 
 void measure_V_sample(void)
 {
@@ -80,8 +86,11 @@ void measure(circuit_t *circuit)
 	debug_to_pi("end measuring");
 
 	packet.circuit_id = circuit->circuit_id;
+
+    //FIXME: Decide to use uint16 or float for this values.
 	packet.real_power = power_acc / N_SAMPLES;
 	packet.irms = I_rms_acc / N_SAMPLES;
 	packet.vrms = V_rms_acc / N_SAMPLES;
+
 	send_to_pi(&packet);
 }

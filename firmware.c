@@ -28,8 +28,9 @@ int main(void)
 	circuit.I_gain = 1;
 	circuit.V_dc_offset = 0;
 
+	debug_to_pi("starting");
 	while (true) {
-		getchar_from_pi();
+		//getchar_from_pi();
 		debug_to_pi("entering measure");
 		measure(&circuit);
 		debug_to_pi("end measure");

@@ -20,7 +20,7 @@ void analog_config(circuit_t *circuit)
 	_channel_config(circuit->I_adc, circuit->I_pin, I_ADC_CH);
 }
 
-float analog_get_V_sample(void)
+volatile float analog_get_V_sample(void)
 {
     return V[v_idx++%1000];
 	uint16_t adc_measure;
@@ -35,7 +35,7 @@ float analog_get_V_sample(void)
 	return _circuit->V_gain * (signed_measure / (float) (1<<12));
 }
 
-float analog_get_I_sample(void)
+volatile float analog_get_I_sample(void)
 {
     return I[i_idx++%1000];
 	uint16_t adc_measure;

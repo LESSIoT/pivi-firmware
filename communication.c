@@ -16,7 +16,6 @@ void communication_init()
 	usart_init_rs232(USART_SERIAL, &USART_SERIAL_OPTIONS);
 }
 
-
 #define SERIAL_START_BYTE  0x7E
 #define SERIAL_STOP_BYTE   0x7F
 #define SERIAL_SUFFED_BYTE 0x7D
@@ -49,22 +48,6 @@ void send_to_pi(const measurement_packet_t *packet)
     usart_send_uint16_stuffed(USART_SERIAL, packet->vrms);
 
     usart_putchar(USART_SERIAL, SERIAL_STOP_BYTE);
-}
-
-void debug_to_pi_uint16(const uint16_t c)
-{
-	usart_putchar(USART_SERIAL, (uint8_t) (c>>8));
-	usart_putchar(USART_SERIAL, (uint8_t) (c & 0x00ff));
-	usart_putchar(USART_SERIAL, '\n');
-}
-void debug_to_pi(const char *c)
-{
-	while (*c)
-	{
-		usart_putchar(USART_SERIAL, *c);
-		c++;
-	}
-	usart_putchar(USART_SERIAL, '\n');
 }
 
 uint8_t getchar_from_pi(void)

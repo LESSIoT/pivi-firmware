@@ -26,14 +26,12 @@ void measure_I_sample(void);
 
 void measure_V_sample(void)
 {
-	//debug_to_pi("v_sample");
 	float V_sample = analog_get_V_sample();
 	uint16_t idx = V_samples_count % I_SAMPLES_BUFF_SIZE;
 
 	V_rms_acc += V_sample * V_sample;
 	power_acc += V_sample * I_samples_buffer[idx];
 
-	debug_to_pi_uint16(V_samples_count);
 	if (!V_samples_count)
 	{
 		time_set_V_period();
@@ -48,7 +46,6 @@ void measure_V_sample(void)
 
 void measure_I_sample(void)
 {
-	//debug_to_pi("i_sample");
 	uint16_t idx = I_samples_count % I_SAMPLES_BUFF_SIZE;
 
 	I_samples_buffer[idx] = analog_get_I_sample();
@@ -69,21 +66,16 @@ void measure(circuit_t *circuit)
 
 
 	analog_config(circuit);
-	debug_to_pi("config");
 
 	measure_I_sample();
-	debug_to_pi("1 sample");
 	time_start_timers(circuit->delay);
 	time_set_V_callback(measure_V_sample);
 	time_set_I_callback(measure_I_sample);
 
 	measuring = true;
-	debug_to_pi("measuring");
 
 	/* wait until all the samples are taken */
 	while (measuring);
-
-	debug_to_pi("end measuring");
 
 	packet.circuit_id = circuit->circuit_id;
 

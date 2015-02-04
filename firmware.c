@@ -64,8 +64,13 @@ int main(void)
 	communication_init();
 	time_init();
 
+    wdt_set_timeout_period(WDT_TIMEOUT_PERIOD_8KCLK); // 8s.
+	wdt_enable();
 	while (true) {
-		measure(CIRCUITS + circuit_idx);
+		wdt_reset();
+		// if measure take more than 8s to complete we have to add
+		// a call to wdt_reset() into measure_I_sample() function.
+		measure(&CIRCUITS[circuit_idx]);
 		circuit_idx = (circuit_idx + 1) % N_CIRCUITS;
 	}
 }

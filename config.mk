@@ -57,6 +57,7 @@ CSRCS = \
        xmega/drivers/nvm/nvm.c                            \
        xmega/drivers/tc/tc.c                              \
        xmega/drivers/usart/usart.c                        \
+              xmega/drivers/wdt/wdt.c                     \
        firmware.c                                         \
        communication.c                                    \
        time.c                                             \
@@ -85,6 +86,7 @@ INC_PATH = \
        xmega/drivers/sleep                                \
        xmega/drivers/tc                                   \
        xmega/drivers/usart                                \
+       xmega/drivers/wdt                                  \
        xmega/utils                                        \
        xmega/utils/preprocessor                           \
        ../medidor-pivi/firmware

@@ -47,6 +47,7 @@ def save_signals():
 
     with open('mock_signals.h', 'w') as fout:
         fout.write('// FS = {:.0f}\n\n'.format(phase.FS))
+        fout.write('#define MOCK_N {:d}\n\n'.format(len(phase.v)))
         write_signal(fout, phase.v, 'V')
         fout.write('\n\n')
         write_signal(fout, phase.i, 'I')

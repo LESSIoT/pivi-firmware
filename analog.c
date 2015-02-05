@@ -22,7 +22,7 @@ void analog_config(circuit_t *circuit)
 
 volatile float analog_get_V_sample(void)
 {
-    return V[v_idx++%1000];
+    return V[v_idx++%MOCK_N];
 	uint16_t adc_measure;
 	int16_t signed_measure;
 	adc_enable(_circuit->V_adc);
@@ -37,7 +37,7 @@ volatile float analog_get_V_sample(void)
 
 volatile float analog_get_I_sample(void)
 {
-    return I[i_idx++%1000];
+    return I[i_idx++%MOCK_N];
 	uint16_t adc_measure;
 	adc_enable(_circuit->V_adc);
 	adc_start_conversion(_circuit->V_adc, V_ADC_CH);

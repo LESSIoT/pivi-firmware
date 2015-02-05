@@ -79,9 +79,9 @@ void measure(circuit_t *circuit)
 
 	packet.circuit_id = circuit->circuit_id;
 
-	packet.real_power = (uint16_t) (power_acc / N_SAMPLES);
-	packet.irms = (uint16_t) (I_rms_acc / N_SAMPLES);
-	packet.vrms = (uint16_t) (V_rms_acc / N_SAMPLES);
+	packet.real_power = (power_acc / N_SAMPLES);
+	packet.irms = (I_rms_acc / N_SAMPLES);
+	packet.vrms = (V_rms_acc / N_SAMPLES);
 
 	send_to_pi(&packet);
 }

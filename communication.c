@@ -32,20 +32,26 @@ static void usart_putchar_stuffed(USART_t *usart, uint8_t c)
     }
 }
 
-static void usart_send_uint16_stuffed(USART_t *usart, uint16_t c)
+static void usart_send_bytes_stuffed(USART_t *usart, const void *c, size_t size)
 {
-	usart_putchar_stuffed(usart, (uint8_t) (c>>8));
-	usart_putchar_stuffed(usart, (uint8_t) (c & 0x00ff));
+    const uint8_t *byte = c;
+    uint8_t i = 0;
+
+    for(i=0; i<size; i++)
+    {
+        usart_putchar_stuffed(usart, byte[i]);
+    }
 }
 
 void send_to_pi(const measurement_packet_t *packet)
 {
     usart_putchar(USART_SERIAL, SERIAL_START_BYTE);
 
-    usart_send_uint16_stuffed(USART_SERIAL, packet->circuit_id);
-    usart_send_uint16_stuffed(USART_SERIAL, packet->real_power);
-    usart_send_uint16_stuffed(USART_SERIAL, packet->irms);
-    usart_send_uint16_stuffed(USART_SERIAL, packet->vrms);
+    // struct.unpack('<Hfff', bin)
+    usart_send_bytes_stuffed(USART_SERIAL, &packet->circuit_id, sizeof(packet->circuit_id));
+    usart_send_bytes_stuffed(USART_SERIAL, &packet->real_power, sizeof(packet->real_power));
+    usart_send_bytes_stuffed(USART_SERIAL, &packet->irms, sizeof(packet->irms));
+    usart_send_bytes_stuffed(USART_SERIAL, &packet->vrms, sizeof(packet->vrms));
 
     usart_putchar(USART_SERIAL, SERIAL_STOP_BYTE);
 }

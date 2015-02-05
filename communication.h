@@ -7,9 +7,9 @@
 
 typedef struct measurement_packet {
 	uint16_t circuit_id;
-	uint16_t real_power;
-	uint16_t irms;
-	uint16_t vrms;
+	float real_power;
+	float irms;
+	float vrms;
 } measurement_packet_t;
 
 

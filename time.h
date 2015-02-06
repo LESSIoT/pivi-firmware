@@ -8,7 +8,8 @@
 #define I_TIMER &TCC0
 #define V_TIMER &TCC1
 
-#define TIMER_PERIOD 31250  //FIXME: this value is just for test
+#define TIMER_FREQ      4000000 // 0.25us resolution
+#define TIMER_PERIOD    1000    // (1/4 Khz) / 0.25us
 
 void time_init(void);
 void time_start_timers(uint16_t v_delay);

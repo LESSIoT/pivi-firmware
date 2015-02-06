@@ -56,5 +56,5 @@ void configure_timer(volatile void *TIMER)
     tc_set_wgm(TIMER, TC_WG_NORMAL);
     tc_write_period(TIMER, TIMER_PERIOD);
     tc_set_overflow_interrupt_level(TIMER, TC_INT_LVL_LO);
-    tc_set_resolution(TIMER, TIMER_PERIOD);
+    tc_set_resolution(TIMER, TIMER_FREQ);
 }

@@ -1,7 +1,6 @@
 
 
 #include "communication.h"
-
 #include "asf.h"
 
 void communication_init()

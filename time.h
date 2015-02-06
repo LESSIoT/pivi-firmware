@@ -3,7 +3,7 @@
 #ifndef _TIME_H
 #define _TIME_H
 
-#include "asf.h"
+#include <tc.h>
 
 #define I_TIMER &TCC0
 #define V_TIMER &TCC1

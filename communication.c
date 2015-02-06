@@ -1,19 +1,21 @@
 
-#include "conf_serial.h"
+
 #include "communication.h"
+
+#include "asf.h"
 
 void communication_init()
 {
-	// USART options.
-	static usart_rs232_options_t USART_SERIAL_OPTIONS = {
-		.baudrate = USART_SERIAL_BAUDRATE,
-		.charlength = USART_SERIAL_CHAR_LENGTH,
-		.paritytype = USART_SERIAL_PARITY,
-		.stopbits = USART_SERIAL_STOP_BIT
-	};
+    // USART options.
+    static usart_rs232_options_t USART_SERIAL_OPTIONS = {
+        .baudrate = USART_SERIAL_BAUDRATE,
+        .charlength = USART_SERIAL_CHAR_LENGTH,
+        .paritytype = USART_SERIAL_PARITY,
+        .stopbits = USART_SERIAL_STOP_BIT
+    };
 
-	// Initialize usart driver in RS232 mode
-	usart_init_rs232(USART_SERIAL, &USART_SERIAL_OPTIONS);
+    // Initialize usart driver in RS232 mode
+    usart_init_rs232(USART_SERIAL, &USART_SERIAL_OPTIONS);
 }
 
 #define SERIAL_START_BYTE  0x7E
@@ -58,5 +60,15 @@ void send_to_pi(const measurement_packet_t *packet)
 
 uint8_t getchar_from_pi(void)
 {
-	return usart_getchar(USART_SERIAL);
+    return usart_getchar(USART_SERIAL);
+}
+
+void debug_to_pi(const char *c)
+{
+   while (*c)
+   {
+       usart_putchar(USART_SERIAL, *c);
+       c++;
+   }
+   usart_putchar(USART_SERIAL, '\n');
 }

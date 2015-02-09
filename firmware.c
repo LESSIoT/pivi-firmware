@@ -55,6 +55,47 @@ circuit_t CIRCUITS[] = {
         },
 };
 
+#ifdef FIRMWARE_FOR_CALIBRATION
+#include "analog.h"
+int main(void)
+{
+    uint8_t circuit_idx = 0;
+    uint16_t v_measure, i_measure;
+
+    board_init();
+    sysclk_init();
+    communication_init();
+    time_init();
+
+     /*
+     *  V_Offset, I_offset, tension y corriente 0
+     *  - esperar sart desde la PC
+     *  - Medir y promediar el canal de tension
+     *  - Medir y promediar el canal de corriente
+     *  - enviar resultados
+     *  V_gian, I_gain, se le pone una tension y corriente conocidas
+     *  - esperar sart desde la PC
+     *  - Medir y promediar el canal de tension
+     *  - Medir y promediar el canal de corriente
+     *  - enviar resultados
+     */
+
+    for(circuit_idx=0; circuit_idx<N_CIRCUITS; circuit_idx++)
+    {
+        getchar_from_pi();
+        analog_config(&CIRCUITS[circuit_idx]);
+
+        v_measure = analog_get_V_sample_calibration();
+        i_measure = analog_get_I_sample_calibration();
+        send_to_pi_calibration(v_measure, i_measure);
+
+        getchar_from_pi();
+        v_measure = analog_get_V_sample_calibration();
+        i_measure = analog_get_I_sample_calibration();
+        send_to_pi_calibration(v_measure, i_measure);
+    }
+}
+#else
 int main(void)
 {
     uint8_t circuit_idx = 0;
@@ -84,3 +125,4 @@ int main(void)
         circuit_idx = (circuit_idx + 1) % N_CIRCUITS;
     }
 }
+#endif

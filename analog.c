@@ -44,6 +44,41 @@ volatile float analog_get_I_sample(void)
     return _circuit->I_gain * (signed_measure / (float) (1<<12));
 }
 
+#define OVERSAMPLING_FACTOR 8
+volatile uint16_t analog_get_V_sample_calibration(void)
+{
+    uint32_t sum = 0;
+    uint16_t i;
+
+    // Sum the configured number of samples.
+    for (i = 0; i < (1 << OVERSAMPLING_FACTOR); i++) {
+        adc_start_conversion(_circuit->V_adc, V_ADC_CH);
+        adc_wait_for_interrupt_flag(_circuit->V_adc, V_ADC_CH);
+        sum += adc_get_result(_circuit->V_adc, V_ADC_CH);
+    }
+
+    // Compute sample mean by scaling down according to oversampling factor.
+    sum >>= OVERSAMPLING_FACTOR;
+
+    return (uint16_t) sum;
+}
+volatile uint16_t analog_get_I_sample_calibration(void)
+{
+    uint32_t sum = 0;
+    uint16_t i;
+
+    // Sum the configured number of samples.
+    for (i = 0; i < (1 << OVERSAMPLING_FACTOR); i++) {
+        adc_start_conversion(_circuit->I_adc, I_ADC_CH);
+        adc_wait_for_interrupt_flag(_circuit->I_adc, I_ADC_CH);
+        sum += adc_get_result(_circuit->I_adc, I_ADC_CH);
+    }
+
+    // Compute sample mean by scaling down according to oversampling factor.
+    sum >>= OVERSAMPLING_FACTOR;
+
+    return (uint16_t) sum;
+}
 void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask)
 {
     struct adc_config adc_conf;

@@ -13,4 +13,8 @@ void analog_config(circuit_t *circuit);
 volatile float analog_get_V_sample(void);
 volatile float analog_get_I_sample(void);
 
+
+volatile uint16_t analog_get_I_sample_calibration(void);
+volatile uint16_t analog_get_V_sample_calibration(void);
+
 #endif /* _ANALOG_H */

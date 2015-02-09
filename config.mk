@@ -97,7 +97,8 @@ CFLAGS =
 CPPFLAGS = \
        -D BOARD=XMEGA_A3BU_XPLAINED                       \
        -D CONFIG_NVM_IGNORE_XMEGA_A3_D3_REVB_ERRATA       \
-       -D IOPORT_XMEGA_COMPAT
+       -D IOPORT_XMEGA_COMPAT                             \
+       -D PYVI_BOARD=$(PYVI_BOARD)
 
 # Extra flags to use when linking
 LDFLAGS =  \

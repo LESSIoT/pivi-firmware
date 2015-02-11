@@ -60,7 +60,7 @@ circuit_t CIRCUITS[] = {
 int main(void)
 {
     uint8_t circuit_idx = 0;
-    uint16_t v_measure, i_measure;
+    volatile uint16_t v_mean, i_mean, v_gain_rms2, i_gain_rms2;
 
     board_init();
     sysclk_init();
@@ -82,17 +82,19 @@ int main(void)
 
     for(circuit_idx=0; circuit_idx<N_CIRCUITS; circuit_idx++)
     {
-        getchar_from_pi();
-        analog_config(&CIRCUITS[circuit_idx]);
+        //getchar_from_pi();
+        //analog_config(&CIRCUITS[circuit_idx]);
+        analog_config(&CIRCUITS[4]);
+        v_mean = analog_get_V_sample_calibration();
+        i_mean = analog_get_I_sample_calibration();
+        //v_mean = 2529;
+        //i_mean = 2264;
+        send_to_pi_calibration(v_mean, i_mean);
 
-        v_measure = analog_get_V_sample_calibration();
-        i_measure = analog_get_I_sample_calibration();
-        send_to_pi_calibration(v_measure, i_measure);
-
-        getchar_from_pi();
-        v_measure = analog_get_V_sample_calibration();
-        i_measure = analog_get_I_sample_calibration();
-        send_to_pi_calibration(v_measure, i_measure);
+        //getchar_from_pi();
+        v_gain_rms2 = analog_get_V_rms_sample_calibration(v_mean);
+        i_gain_rms2 = analog_get_I_rms_sample_calibration(i_mean);
+        send_to_pi_calibration(v_gain_rms2, i_gain_rms2);
     }
 }
 #else

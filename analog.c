@@ -79,6 +79,40 @@ volatile uint16_t analog_get_I_sample_calibration(void)
 
     return (uint16_t) sum;
 }
+
+#define N_MEASURES_1_SEC 166666
+volatile uint16_t analog_get_I_rms_sample_calibration(uint16_t i_mean)
+{
+    uint32_t sum = 0, i;
+    uint16_t measure;
+
+    // 1 segundo
+    for (i = 0; i < N_MEASURES_1_SEC; i++) {
+        adc_start_conversion(_circuit->I_adc, I_ADC_CH);
+        adc_wait_for_interrupt_flag(_circuit->I_adc, I_ADC_CH);
+        measure = adc_get_result(_circuit->I_adc, I_ADC_CH);
+        sum += (measure-i_mean) * (measure-i_mean);
+    }
+
+    // Compute sample mean by scaling down according to oversampling factor.
+    return (uint16_t) (sum / N_MEASURES_1_SEC);
+}
+volatile uint16_t analog_get_V_rms_sample_calibration(uint16_t v_mean)
+{
+    uint32_t sum = 0, i;
+    uint16_t measure;
+
+    // 1 segundo
+    for (i = 0; i < N_MEASURES_1_SEC; i++) {
+        adc_start_conversion(_circuit->V_adc, V_ADC_CH);
+        adc_wait_for_interrupt_flag(_circuit->V_adc, V_ADC_CH);
+        measure = adc_get_result(_circuit->V_adc, V_ADC_CH);
+        sum += (measure-v_mean) * (measure-v_mean);
+    }
+
+    // Compute sample mean by scaling down according to oversampling factor.
+    return (uint16_t) (sum / N_MEASURES_1_SEC);
+}
 void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask)
 {
     struct adc_config adc_conf;

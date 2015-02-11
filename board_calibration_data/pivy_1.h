@@ -23,9 +23,9 @@
 #define C4_I_GAIN 1
 #define C4_DELAY 100
 
-#define C5_V_OFFSET 0
-#define C5_I_OFFSET 0
-#define C5_V_GAIN 1
+#define C5_V_OFFSET 2529
+#define C5_I_OFFSET 2264
+#define C5_V_GAIN 1   //7.55
 #define C5_I_GAIN 1
 #define C5_DELAY 100
 

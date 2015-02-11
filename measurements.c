@@ -89,5 +89,5 @@ void measure(circuit_t *circuit)
     packet.irms = (I_rms_acc / N_SAMPLES);
     packet.vrms = (V_rms_acc / N_SAMPLES);
 
-    //send_to_pi(&packet);
+    send_to_pi(&packet);
 }

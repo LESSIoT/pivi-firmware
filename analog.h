@@ -4,7 +4,7 @@
 
 #include "firmware.h"
 
-#define ADC_FREQ   200000UL //2000000UL
+#define ADC_FREQ   2000000UL
 
 #define V_ADC_CH    ADC_CH0
 #define I_ADC_CH    ADC_CH1

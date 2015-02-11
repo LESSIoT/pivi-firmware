@@ -120,8 +120,7 @@ int main(void)
         wdt_reset();
         // if measure takes more than 8s to complete we'll have to add
         // a call to wdt_reset() into measure_I_sample() function.
-        measure(&circuit_test);
-        //measure(&CIRCUITS[circuit_idx]);
+        measure(&CIRCUITS[circuit_idx]);
         circuit_idx = (circuit_idx + 1) % N_CIRCUITS;
     }
 }

@@ -82,34 +82,22 @@ int main(void)
 
     for(circuit_idx=0; circuit_idx<N_CIRCUITS; circuit_idx++)
     {
-        //getchar_from_pi();
-        //analog_config(&CIRCUITS[circuit_idx]);
-        analog_config(&CIRCUITS[4]);
+        getchar_from_pi();
+        analog_config(&CIRCUITS[circuit_idx]);
         v_mean = analog_get_V_sample_calibration();
         i_mean = analog_get_I_sample_calibration();
-        //v_mean = 2529;
-        //i_mean = 2264;
-        send_to_pi_calibration(v_mean, i_mean);
+        send_to_pi_mean_calibration(v_mean, i_mean);
 
-        //getchar_from_pi();
+        getchar_from_pi();
         v_gain_rms2 = analog_get_V_rms_sample_calibration(v_mean);
         i_gain_rms2 = analog_get_I_rms_sample_calibration(i_mean);
-        send_to_pi_calibration(v_gain_rms2, i_gain_rms2);
+        send_to_pi_gain_calibration(v_gain_rms2, i_gain_rms2);
     }
 }
 #else
 int main(void)
 {
     uint8_t circuit_idx = 0;
-
-    circuit_t circuit_test = {
-            .circuit_id = 99,
-            .V_adc = &ADCB, .V_pin = ADCCH_POS_PIN0,
-            .I_adc = &ADCB, .I_pin = ADCCH_POS_PIN1,
-            .V_dc_offset = 0, .I_dc_offset = 0,
-            .V_gain = 1, .I_gain = 1,
-            .delay = 100
-          };
 
     board_init();
     sysclk_init();

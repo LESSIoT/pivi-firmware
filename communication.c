@@ -57,7 +57,7 @@ void send_to_pi(const measurement_packet_t *packet)
     usart_putchar(USART_SERIAL, SERIAL_STOP_BYTE);
 }
 
-void send_to_pi_calibration(const uint16_t v_measure, const uint16_t i_measure)
+void send_to_pi_mean_calibration(const uint16_t v_measure, const uint16_t i_measure)
 {
     usart_putchar(USART_SERIAL, SERIAL_START_BYTE);
     // struct.unpack('<HH', bin)
@@ -65,6 +65,15 @@ void send_to_pi_calibration(const uint16_t v_measure, const uint16_t i_measure)
     usart_send_bytes_stuffed(USART_SERIAL, &i_measure, sizeof(i_measure));
     usart_putchar(USART_SERIAL, SERIAL_STOP_BYTE);
 }
+void send_to_pi_gain_calibration(const uint32_t v_measure, const uint32_t i_measure)
+{
+    usart_putchar(USART_SERIAL, SERIAL_START_BYTE);
+    // struct.unpack('<II', bin)
+    usart_send_bytes_stuffed(USART_SERIAL, &v_measure, sizeof(v_measure));
+    usart_send_bytes_stuffed(USART_SERIAL, &i_measure, sizeof(i_measure));
+    usart_putchar(USART_SERIAL, SERIAL_STOP_BYTE);
+}
+
 uint8_t getchar_from_pi(void)
 {
     return usart_getchar(USART_SERIAL);

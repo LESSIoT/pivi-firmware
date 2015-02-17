@@ -3,7 +3,7 @@
 PRJ_PATH = ../../asf-3.21.0
 
 # Microcontroller: atxmega128a1, atmega128, attiny261, etc.
-MCU = atxmega256a3bu
+MCU = atxmega128a3u
 
 # Application target name. Given with suffix .a for library and .elf for a
 # standalone application.

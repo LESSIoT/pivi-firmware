@@ -55,4 +55,4 @@ MAKEFILE_PATH = ../../asf-3.21.0/common/utils/make/Makefile.avr.in
 include $(MAKEFILE_PATH)
 
 program: all
-	avrdude -c dragon_jtag -p x256a3bu -U flash:w:firmware.hex:i
+	avrdude -c dragon_jtag -p x128a3u -U flash:w:firmware.hex:i

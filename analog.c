@@ -101,13 +101,15 @@ volatile uint16_t analog_get_V_rms_sample_calibration(uint16_t v_mean)
 {
     uint32_t sum = 0, i;
     uint16_t measure;
+    float v_no_mean;
 
     // 1 segundo
     for (i = 0; i < N_MEASURES_1_SEC; i++) {
         adc_start_conversion(_circuit->V_adc, V_ADC_CH);
         adc_wait_for_interrupt_flag(_circuit->V_adc, V_ADC_CH);
         measure = adc_get_result(_circuit->V_adc, V_ADC_CH);
-        sum += (measure-v_mean) * (measure-v_mean);
+        v_no_mean = measure-v_mean;
+        sum += (v_no_mean) * (v_no_mean);
     }
 
     // Compute sample mean by scaling down according to oversampling factor.

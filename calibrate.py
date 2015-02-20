@@ -75,11 +75,15 @@ if __name__ == "__main__":
         write_char(port)
         v_rms2, i_rms2 = read_calibration_package(port, '<II')
         print('v_rms2 = {}, i_rms2 = {}\n'.format(v_rms2, i_rms2))
-        calibration[circuit_id]['v_gain'] = V_RMS / ((v_rms2**.5) / (1 << 12))
-        calibration[circuit_id]['i_gain'] = I_RMS / ((i_rms2**.5) / (1 << 12))
-
+        try:
+            calibration[circuit_id]['v_gain'] = V_RMS / ((v_rms2**.5) / (1 << 12))
+            calibration[circuit_id]['i_gain'] = I_RMS / ((i_rms2**.5) / (1 << 12))
+        except:
+            pass
         delay = ask_for_number('Insert the delay for V channel [us]: ')
         calibration[circuit_id]['delay'] = int(float(delay) * 4)
 
-    write_header_file(board_number, calibration)
+    print calibration
+
+#    write_header_file(board_number, calibration)
 

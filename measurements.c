@@ -6,7 +6,6 @@
 #include "time.h"
 #include "asf.h"
 
-#include <ioport.h>
 #include "gpio.h"
 
 volatile float I_samples_buffer[I_SAMPLES_BUFF_SIZE];
@@ -26,7 +25,6 @@ void measure_I_sample(void);
 
 void measure_V_sample(void)
 {
-    ioport_set_value(PA1, 1);
     float V_sample = analog_get_V_sample();
 
     uint16_t idx = V_samples_count % I_SAMPLES_BUFF_SIZE;
@@ -44,7 +42,6 @@ void measure_V_sample(void)
         time_stop_V_timer();
         measuring = false;
     }
-    ioport_set_value(PA1, 0);
 }
 
 void measure_I_sample(void)
@@ -67,12 +64,8 @@ void measure(circuit_t *circuit)
     I_samples_count = 0; V_samples_count = 0;
     I_rms_acc = 0; V_rms_acc = 0; power_acc = 0;
 
-    ioport_configure_pin(PA1, IOPORT_DIR_OUTPUT | IOPORT_INIT_LOW);
-    ioport_configure_pin(PA0, IOPORT_DIR_OUTPUT | IOPORT_INIT_LOW);
-
     analog_config(circuit);
 
-    ioport_set_value(PA0, 1);
     measure_I_sample();
     time_start_timers(circuit->delay);
     time_set_V_callback(measure_V_sample);
@@ -82,7 +75,6 @@ void measure(circuit_t *circuit)
 
     /* wait until all the samples are taken */
     while (measuring);
-    ioport_set_value(PA0, 0);
     packet.circuit_id = circuit->circuit_id;
 
     packet.real_power = (power_acc / N_SAMPLES);

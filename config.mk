@@ -1,6 +1,6 @@
 
 # Path to top level ASF directory relative to this project directory.
-PRJ_PATH = ../../asf-3.21.0
+PRJ_PATH = ../asf-3.21.0
 
 # Microcontroller: atxmega128a1, atmega128, attiny261, etc.
 MCU = atxmega128a3u
@@ -52,7 +52,7 @@ INC_PATH = \
        xmega/drivers/wdt                                  \
        xmega/utils                                        \
        xmega/utils/preprocessor                           \
-       ../medidor-pivi/firmware
+       ../pivi-firmware
 
 # Library paths from the top-level source directory
 LIB_PATH =

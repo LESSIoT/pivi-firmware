@@ -3,7 +3,7 @@
 The provided Dockerfile creates an Ubuntu 14.04.2 installation with a
 manually built avr-libc 1.8.1.
 
-This instructions have been tested on Debian 8
+These instructions have been tested on Debian 8
 
 ## Create the docker image
 

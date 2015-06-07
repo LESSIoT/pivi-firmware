@@ -6,7 +6,7 @@
 
 import os
 import struct
-
+import pickle
 from pyvi import SerialTransport
 
 settings = {'port': '/dev/ttyUSB0',
@@ -15,6 +15,40 @@ settings = {'port': '/dev/ttyUSB0',
 
 V_RMS = 220
 I_RMS = 10
+
+def ask_for_circuits_to_calibrate():
+    list_of_ids = []
+    reply = 'y'
+    circuit_id = ask_for_id('Insert one ID of a circuit you want to calibrate:')
+    list_of_ids.append(circuit_id)
+    reply=ask_for_y_or_n("Want to check more circuits? (y or n)")
+    while reply == 'y':
+            circuit_id = ask_for_id('Insert one ID of a circuit you want to calibrate:')
+            if circuit_id not in list_of_ids:
+                    list_of_ids.append(circuit_id)
+            reply=ask_for_y_or_n("Want to check more circuits? (y or n)")
+    list_of_ids.sort()
+    return list_of_ids
+
+
+def ask_for_y_or_n(question):
+    reply = None
+    while reply is None:
+            reply = raw_input(question)
+            if not (reply == 'y' or reply == 'n'):
+                    print("{} is not a valid answer".format(reply))
+                    reply = None
+    return reply
+
+
+def ask_for_id(question):
+    number = None
+    while number is None:
+        number = raw_input(question)
+        if not(number.isdigit()) or (int(number) > 6 or int(number) <= 0 ):
+            print("'{!r}' is not a circuit ID".format(number))
+            number = None
+    return number
 
 
 def read_calibration_package(port, struct_str):
@@ -49,7 +83,7 @@ CIRCUIT_DEFINE_TPL = '''
 '''
 
 
-def write_header_file(board_number, calibration):
+def write_header_file(calibration, board_number):
     fname = './board_calibration_data/pivy_{}.h'.format(board_number)
     with open(fname+'.tmp', 'w') as fout:
         for circuit_id in range(1, 7):
@@ -58,13 +92,29 @@ def write_header_file(board_number, calibration):
     os.rename(fname+'.tmp', fname)
     print('calibration data writed to {}'.format(fname))
 
+
+def write_pickled_data(board_number, calibration):
+    fname = './board_calibration_data/pickled_board_{}'.format(board_number)
+    fpickle = open(fname, 'wb')
+    picle.dump(calibration ,fpickle)
+    
+
+def read_pickled_data(board_number):
+    fname = './board_calibration_data/pickled_board_{}'.format(board_number)
+    mode = 'rb' is os.path.exist(fname) else 'wb'
+    fpickle = open(fname, mode)
+    calibration = pickle.load(fpickle)
+    return calibration
+
 if __name__ == "__main__":
+
     port = SerialTransport()
     port.open(settings)
-
     board_number = ask_for_number('Insert the board number: ')
-    calibration = {}
-    for circuit_id in range(1, 7):
+    calibration = read_pickled_data(board_number)
+    list_of_ids = ask_for_circuits_to_calibrate()
+
+    for circuit_id in list_of_ids:
         calibration[circuit_id] = {}
         print('\n\nCalibrating the number circuit {}'.format(circuit_id))
         print('Measuring offset, disconnect V and I, and press any key')
@@ -87,8 +137,7 @@ if __name__ == "__main__":
             pass
         delay = ask_for_number('Insert the delay for V channel [us]: ')
         calibration[circuit_id]['delay'] = int(float(delay) * 4)
-
+        
+    write_pickled_data(calibration, board_number)
+    write_header_file(calibration, board_number)
     print calibration
-
-#    write_header_file(board_number, calibration)
-

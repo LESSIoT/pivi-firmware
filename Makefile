@@ -54,5 +54,5 @@ VERBOSE = 1
 MAKEFILE_PATH = ../asf-3.21.0/common/utils/make/Makefile.avr.in
 include $(MAKEFILE_PATH)
 
-program: all
+program: 
 	avrdude -c dragon_jtag -p x128a3u -U flash:w:firmware.hex:i

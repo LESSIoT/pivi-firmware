@@ -42,7 +42,6 @@ CIRCUIT_DEFINE_TPL = '''
 def write_header_file(calibration, fname):
     with open(fname+'.tmp', 'w') as fout:
         for circuit_id in range(1,7):
-            print CIRCUIT_DEFINE_TPL.format(circuit_id, calibration[circuit_id])
             fout.write(CIRCUIT_DEFINE_TPL.format(circuit_id, calibration[circuit_id]))
     os.rename(fname+'.tmp', fname)
     print('calibration data writed to {}'.format(fname))
@@ -133,12 +132,12 @@ if __name__ == "__main__":
         v_rms2, i_rms2 = read_calibration_package(port, '<II')
         print('v_rms2 = {}, i_rms2 = {}\n'.format(v_rms2, i_rms2))
         try:
-            calibration[circuit_id]['v_gain'] = 10 #V_RMS / ((v_rms2**.5) / (1 << 12))
-            calibration[circuit_id]['i_gain'] = 10 #I_RMS / ((i_rms2**.5) / (1 << 12))
+            calibration[circuit_id]['v_gain'] = V_RMS / ((v_rms2**.5) / (1 << 12))
+            calibration[circuit_id]['i_gain'] = I_RMS / ((i_rms2**.5) / (1 << 12))
         except:
             pass
         delay = ask_for_number('Insert the delay for V channel [us]: ')
-        calibration[circuit_id]['delay'] = delay #int(float(delay) * 4) despues borrar "delay" dejar solo a partir de int
-    
+        calibration[circuit_id]['delay'] = int(float(delay) * 4) 
+    print 'calibration-> ' , calibration
     write_pickled_data(calibration, pfname)
     write_header_file(calibration, fname)

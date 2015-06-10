@@ -39,34 +39,49 @@ CIRCUIT_DEFINE_TPL = '''
 '''
 
 
-def write_header_file(calibration, board_number, list_of_ids):
-    fname = './board_calibration_data/pivy_{}.h'.format(board_number)
+def write_header_file(calibration, fname):
     with open(fname+'.tmp', 'w') as fout:
-        for circuit_id in list_of_ids:
-            fout.write(CIRCUIT_DEFINE_TPL.format(circuit_id,
-                                                 calibration[circuit_id]))
+        for circuit_id in range(1,7):
+            print CIRCUIT_DEFINE_TPL.format(circuit_id, calibration[circuit_id])
+            fout.write(CIRCUIT_DEFINE_TPL.format(circuit_id, calibration[circuit_id]))
     os.rename(fname+'.tmp', fname)
     print('calibration data writed to {}'.format(fname))
 
 
-def write_pickled_data(board_number, calibration):
-    fname = './board_calibration_data/pickled_board_{}'.format(board_number)
-    with  open(fname, 'wb') as fpickle:
-        picle.dump(calibration ,fpickle)
+def ask_for_number(question):
+    number = None
+    while number is None:
+        number = raw_input(question)
+        if not number.isdigit():
+            print("'{!r}' is not a number".format(number))
+            number = None
+    return number
+
+
+def write_pickled_data(calibration, pfname):
+    with  open(pfname, 'wb') as fpickle:
+        pickle.dump(calibration ,fpickle)
     
 
-def read_pickled_data(board_number):
-    fname = './board_calibration_data/pickled_board_{}'.format(board_number)
-    with open(fname, 'rb') as fpickle:  #if the file does not exist the program crashes
+def read_pickled_data(pfname):
+    with open(pfname, 'rb') as fpickle:  
         calibration = pickle.load(fpickle)
     return calibration
 
-def complete_the_list(list_of_ids)
-    not_in_list = []
-    for i in range(1,7):
-        if not i in list_of_ids:
-            not_in_list.append(i)
-    return not_in_list
+
+def check_file_for_pickle(fname):
+    if not os.path.exists(fname):
+        calibration = {} 
+        for circuit_id in range(1,7):
+            calibration[circuit_id]={}
+            calibration[circuit_id]['v_offset'] = 0
+            calibration[circuit_id]['i_offset'] = 0 
+            calibration[circuit_id]['v_gain'] = 0
+            calibration[circuit_id]['i_gain'] = 0 
+            calibration[circuit_id]['delay'] = 0 
+        write_pickled_data(calibration, fname)
+    else:
+        pass
 
 
 if __name__ == "__main__":
@@ -74,15 +89,19 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Select the board and circuits to calibrate.')
     parser.add_argument('-b', dest= 'board_c', help= 'Number of board to calibrate.')
     parser.add_argument('-c', dest ='circuits', metavar='N',  type=int, nargs='+',
-                       help='Circuits to calibate.')
+                       help='IDs of circuits to calibrate. (1 to 6)')
     parser.add_argument('--all', dest='board',
                        help='Calibrate all circuits in the selected board.')
     args = parser.parse_args()
-    if args.circuits and args.board_c >=1:
+    if args.circuits and args.board_c >= 1:
+        for i in args.circuits:
+            if not i in range(1,7):
+                print 'ID of circuit out of range. (1 to 6)'
+                quit()
         print 'Calibrate circuits ', args.circuits, ' in board ', args.board_c
         board_number = args.board_c
         list_of_ids = args.circuits
-    elif args.board >=1:
+    elif args.board >= 1:
         print 'Calibrate all circuits in board ' , args.board
         board_number = args.board
         list_of_ids = [1 , 2, 3, 4, 5, 6]
@@ -91,12 +110,15 @@ if __name__ == "__main__":
         quit()
     port = SerialTransport()
     port.open(settings)
-    calibration = read_pickled_data(board_number)
-    #not_in_list = complete_the_list(list_of_ids)
-    
+    pfname = './board_calibration_data/pickled_board_{}'.format(board_number)
+    fname = './board_calibration_data/pivy_{}.h'.format(board_number)
+
+    check_file_for_pickle(pfname)     
+    calibration = read_pickled_data(pfname)
+
     for circuit_id in list_of_ids:
         calibration[circuit_id] = {}
-        print('\n\nCalibrating the number circuit {}'.format(circuit_id))
+        print('\n\nCalibrating circuit number  {}'.format(circuit_id))
         print('Measuring offset, disconnect V and I, and press any key')
         raw_input('')
         write_char(port)
@@ -111,13 +133,12 @@ if __name__ == "__main__":
         v_rms2, i_rms2 = read_calibration_package(port, '<II')
         print('v_rms2 = {}, i_rms2 = {}\n'.format(v_rms2, i_rms2))
         try:
-            calibration[circuit_id]['v_gain'] = V_RMS / ((v_rms2**.5) / (1 << 12))
-            calibration[circuit_id]['i_gain'] = I_RMS / ((i_rms2**.5) / (1 << 12))
+            calibration[circuit_id]['v_gain'] = 10 #V_RMS / ((v_rms2**.5) / (1 << 12))
+            calibration[circuit_id]['i_gain'] = 10 #I_RMS / ((i_rms2**.5) / (1 << 12))
         except:
             pass
         delay = ask_for_number('Insert the delay for V channel [us]: ')
-        calibration[circuit_id]['delay'] = int(float(delay) * 4)
+        calibration[circuit_id]['delay'] = delay #int(float(delay) * 4) despues borrar "delay" dejar solo a partir de int
     
-    write_pickled_data(calibration, board_number)
-    write_header_file(calibration, board_number, list_of_ids)
-    print calibration
+    write_pickled_data(calibration, pfname)
+    write_header_file(calibration, fname)

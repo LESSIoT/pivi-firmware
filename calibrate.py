@@ -135,7 +135,9 @@ if __name__ == "__main__":
             calibration[circuit_id]['v_gain'] = V_RMS / ((v_rms2**.5) / (1 << 12))
             calibration[circuit_id]['i_gain'] = I_RMS / ((i_rms2**.5) / (1 << 12))
         except:
-            pass
+            print ('Error, vrms = 0 or irms = 0')
+            calibration[circuit_id]['v_gain'] = 1 
+            calibration[circuit_id]['i_gain'] = 1
         delay = ask_for_number('Insert the delay for V channel [us]: ')
         calibration[circuit_id]['delay'] = int(float(delay) * 4) 
     print 'calibration-> ' , calibration

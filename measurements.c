@@ -6,25 +6,23 @@
  * Author: Diego Mascialino <dmascialino@gmail.com>
  */
 
+#define BUF_SIZE 16 //only for debug
+char buf[BUF_SIZE];
 
+#include <stdio.h>
 #include "measurements.h"
 #include "communication.h"
 #include "firmware.h"
 #include "analog.h"
 #include "time.h"
 #include "asf.h"
-
 #include "gpio.h"
 
 volatile float I_samples_buffer[I_SAMPLES_BUFF_SIZE];
 volatile uint16_t I_samples_count, V_samples_count;
-
 volatile float I_rms_acc, V_rms_acc, power_acc;
-
 volatile uint8_t measuring;
 
-#define PA1 IOPORT_CREATE_PIN(PORTA, 1)
-#define PA0 IOPORT_CREATE_PIN(PORTA, 0)
 
 /* internal functions prototypes */
 void measure_V_sample(void);
@@ -67,27 +65,41 @@ void measure_I_sample(void)
 
 void measure(circuit_t *circuit)
 {
-    measurement_packet_t packet;
+  if (ioport_get_value(circuit->ct_detector_pin))
+    { 
+        debug_to_pi("pasa el if ioport_get value \n");  
+        measurement_packet_t packet;
 
-    I_samples_count = 0; V_samples_count = 0;
-    I_rms_acc = 0; V_rms_acc = 0; power_acc = 0;
+        I_samples_count = 0; V_samples_count = 0;
+        I_rms_acc = 0; V_rms_acc = 0; power_acc = 0;
 
-    analog_config(circuit);
+        analog_config(circuit);
+        
+        debug_to_pi("pasa analog_config\n");
+        measure_I_sample();
+        time_start_timers(circuit->delay);
+        time_set_V_callback(measure_V_sample);
+        time_set_I_callback(measure_I_sample);
 
-    measure_I_sample();
-    time_start_timers(circuit->delay);
-    time_set_V_callback(measure_V_sample);
-    time_set_I_callback(measure_I_sample);
+        measuring = true;
 
-    measuring = true;
+        // wait until all the samples are taken 
+        while (measuring);
+        packet.circuit_id = circuit->circuit_id;
 
-    /* wait until all the samples are taken */
-    while (measuring);
-    packet.circuit_id = circuit->circuit_id;
-
-    packet.real_power = (power_acc / N_SAMPLES);
-    packet.irms = (I_rms_acc / N_SAMPLES);
-    packet.vrms = (V_rms_acc / N_SAMPLES);
-
-    send_to_pi(&packet);
+        packet.real_power = (power_acc / N_SAMPLES);
+        packet.irms = (I_rms_acc / N_SAMPLES);
+        packet.vrms = (V_rms_acc / N_SAMPLES);
+        debug_to_pi("crea el paquete\n");
+        send_to_pi(&packet);
+        debug_to_pi("lo envia a la pi\n");
+    }  
+//    sprintf(buf , "%d", ioport_get_value(circuit->ct_detector_pin));
+//    debug_to_pi(buf);
+//    sprintf(buf , "%d", circuit->circuit_id);
+//    debug_to_pi(buf);
+//    debug_to_pi(" ");
 }
+
+
+

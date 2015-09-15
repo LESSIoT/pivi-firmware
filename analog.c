@@ -16,14 +16,14 @@ circuit_t * _circuit;
 uint8_t v_idx = 0, i_idx = 0;
 
 /* internal functions prototypes */
-void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask);
+void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask,enum adc_reference ADC_REF);
 /* ----------------------------- */
 
 void analog_config(circuit_t *circuit)
 {
     _circuit = circuit;
-    _channel_config(circuit->V_adc, circuit->V_pin, V_ADC_CH);
-    _channel_config(circuit->I_adc, circuit->I_pin, I_ADC_CH);
+    _channel_config(circuit->V_adc, circuit->V_pin, V_ADC_CH, circuit->V_ref);
+    _channel_config(circuit->I_adc, circuit->I_pin, I_ADC_CH, circuit->I_ref);
 }
 
 volatile float analog_get_V_sample(void)
@@ -123,7 +123,7 @@ volatile uint16_t analog_get_V_rms_sample_calibration(uint16_t v_mean)
     // Compute sample mean by scaling down according to oversampling factor.
     return (uint16_t) (sum / N_MEASURES_1_SEC);
 }
-void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask)
+void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask, enum adc_reference ADC_REF)
 {
     struct adc_config adc_conf;
     struct adc_channel_config adcch_conf;
@@ -133,11 +133,11 @@ void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask)
 
     /* Configure the ADC module:
      * - unsigned, 12-bit results
-     * - bandgap (1 V) voltage reference
+     * - external voltage reference
      * - 200 kHz maximum clock rate
      * - manual conversion triggering
      */
-    adc_set_conversion_parameters(&adc_conf, ADC_SIGN_OFF, ADC_RES_12, ADC_REF_BANDGAP);
+    adc_set_conversion_parameters(&adc_conf, ADC_SIGN_OFF, ADC_RES_12, ADC_REF);
     adc_set_clock_rate(&adc_conf, ADC_FREQ);
     adc_set_conversion_trigger(&adc_conf, ADC_TRIG_MANUAL, 2, 0);
     adc_write_configuration(adc, &adc_conf);

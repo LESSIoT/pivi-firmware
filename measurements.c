@@ -7,8 +7,6 @@
  */
 
 #define BUF_SIZE 16 //only for debug
-char buf[BUF_SIZE];
-
 #include <stdio.h>
 #include "measurements.h"
 #include "communication.h"
@@ -67,7 +65,6 @@ void measure(circuit_t *circuit)
 {
   if (ioport_get_value(circuit->ct_detector_pin))
     { 
-        debug_to_pi("pasa el if ioport_get value \n");  
         measurement_packet_t packet;
 
         I_samples_count = 0; V_samples_count = 0;
@@ -75,7 +72,6 @@ void measure(circuit_t *circuit)
 
         analog_config(circuit);
         
-        debug_to_pi("pasa analog_config\n");
         measure_I_sample();
         time_start_timers(circuit->delay);
         time_set_V_callback(measure_V_sample);
@@ -90,15 +86,8 @@ void measure(circuit_t *circuit)
         packet.real_power = (power_acc / N_SAMPLES);
         packet.irms = (I_rms_acc / N_SAMPLES);
         packet.vrms = (V_rms_acc / N_SAMPLES);
-        debug_to_pi("crea el paquete\n");
         send_to_pi(&packet);
-        debug_to_pi("lo envia a la pi\n");
     }  
-//    sprintf(buf , "%d", ioport_get_value(circuit->ct_detector_pin));
-//    debug_to_pi(buf);
-//    sprintf(buf , "%d", circuit->circuit_id);
-//    debug_to_pi(buf);
-//    debug_to_pi(" ");
 }
 
 

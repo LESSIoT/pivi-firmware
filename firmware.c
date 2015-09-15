@@ -149,13 +149,10 @@ int main(void)
     init_pins();
     while (true) {
         wdt_reset();
-        debug_to_pi("inicio\n");
         // if measure takes more than 8s to complete we'll have to add
         // a call to wdt_reset() into measure_I_sample() function.
         measure(&CIRCUITS[circuit_idx]);
-        debug_to_pi("despues de measure()\n");
         circuit_idx = (circuit_idx + 1) % N_CIRCUITS;
-        // debug_to_pi("sep, funca\n");
     }   
 }
 #endif

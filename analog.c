@@ -16,7 +16,7 @@ circuit_t * _circuit;
 uint8_t v_idx = 0, i_idx = 0;
 
 /* internal functions prototypes */
-void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask,enum adc_reference ADC_REF);
+void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask,enum adc_reference adc_ref);
 /* ----------------------------- */
 
 void analog_config(circuit_t *circuit)
@@ -123,7 +123,7 @@ volatile uint16_t analog_get_V_rms_sample_calibration(uint16_t v_mean)
     // Compute sample mean by scaling down according to oversampling factor.
     return (uint16_t) (sum / N_MEASURES_1_SEC);
 }
-void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask, enum adc_reference ADC_REF)
+void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask, enum adc_reference adc_ref)
 {
     struct adc_config adc_conf;
     struct adc_channel_config adcch_conf;
@@ -137,7 +137,7 @@ void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask,
      * - 200 kHz maximum clock rate
      * - manual conversion triggering
      */
-    adc_set_conversion_parameters(&adc_conf, ADC_SIGN_OFF, ADC_RES_12, ADC_REF);
+    adc_set_conversion_parameters(&adc_conf, ADC_SIGN_OFF, ADC_RES_12, adc_ref);
     adc_set_clock_rate(&adc_conf, ADC_FREQ);
     adc_set_conversion_trigger(&adc_conf, ADC_TRIG_MANUAL, 2, 0);
     adc_write_configuration(adc, &adc_conf);

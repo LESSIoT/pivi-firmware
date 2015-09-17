@@ -102,7 +102,7 @@ int main(void)
      *  - Medir y promediar el canal de tension
      *  - Medir y promediar el canal de corriente
      *  - enviar resultados
-     *  V_gian, I_gain, se le pone una tension y corriente conocidas
+     *  V_gain, I_gain, se le pone una tension y corriente conocidas
      *  - esperar sart desde la PC
      *  - Medir y promediar el canal de tension
      *  - Medir y promediar el canal de corriente

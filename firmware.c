@@ -90,6 +90,7 @@ circuit_t CIRCUITS[] = {
 int main(void)
 {
     uint8_t circuit_idx = 0;
+    int circuits_to_cal[5];
     volatile uint16_t v_mean, i_mean, v_gain_rms2, i_gain_rms2;
     board_init();
     sysclk_init();
@@ -108,19 +109,25 @@ int main(void)
      *  - Medir y promediar el canal de corriente
      *  - enviar resultados
      */
-
-    for(circuit_idx=0; circuit_idx<N_CIRCUITS; circuit_idx++)
+    for(circuit_idx=0; circuit_idx<6; circuit_idx++)
     {
-        getchar_from_pi();
-        analog_config(&CIRCUITS[circuit_idx]);
-        v_mean = analog_get_V_sample_calibration();
-        i_mean = analog_get_I_sample_calibration();
-        send_to_pi_mean_calibration(v_mean, i_mean);
+        circuits_to_cal[circuit_idx] =(int)getchar_from_pi() - '0';
+    }
 
-        getchar_from_pi();
-        v_gain_rms2 = analog_get_V_rms_sample_calibration(v_mean);
-        i_gain_rms2 = analog_get_I_rms_sample_calibration(i_mean);
-        send_to_pi_gain_calibration(v_gain_rms2, i_gain_rms2);
+    debug_to_pi("cargo cosas");
+
+    for(circuit_idx=0; circuit_idx<N_CIRCUITS && circuits_to_cal[circuit_idx]>0 && circuits_to_cal[circuit_idx] < 7; circuit_idx++)
+    {   
+            getchar_from_pi();
+            analog_config(&CIRCUITS[circuits_to_cal[circuit_idx]]);
+            v_mean = analog_get_V_sample_calibration();
+            i_mean = analog_get_I_sample_calibration();
+            send_to_pi_mean_calibration(v_mean, i_mean);
+
+            getchar_from_pi();
+            v_gain_rms2 = analog_get_V_rms_sample_calibration(v_mean);
+            i_gain_rms2 = analog_get_I_rms_sample_calibration(i_mean);
+            send_to_pi_gain_calibration(v_gain_rms2, i_gain_rms2);
     }
 }
 #else
@@ -147,7 +154,8 @@ int main(void)
     wdt_set_timeout_period(WDT_TIMEOUT_PERIOD_8KCLK); // 8s.
     wdt_enable();
     init_pins();
-    while (true) {
+    while (true) 
+    {
         wdt_reset();
         // if measure takes more than 8s to complete we'll have to add
         // a call to wdt_reset() into measure_I_sample() function.

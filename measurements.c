@@ -7,6 +7,8 @@
  */
 
 #define BUF_SIZE 16 //only for debug
+char buf[BUF_SIZE];
+#include <math.h>
 #include <stdio.h>
 #include "measurements.h"
 #include "communication.h"
@@ -85,6 +87,8 @@ void measure(circuit_t *circuit)
 
         packet.real_power = (power_acc / N_SAMPLES);
         packet.irms = (I_rms_acc / N_SAMPLES);
+        //sprintf(buf,"\n irms = %f \n",I_rms_acc);
+        //debug_to_pi(buf);
         packet.vrms = (V_rms_acc / N_SAMPLES);
         send_to_pi(&packet);
     }  

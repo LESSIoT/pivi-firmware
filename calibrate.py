@@ -4,6 +4,7 @@
 # Copyright (C) 2014, 2015 LESS Industries S.A.
 # Author: Diego Mascialino <dmascialino@gmail.com>
 
+from time import sleep
 import os
 import struct
 import pickle
@@ -38,6 +39,12 @@ CIRCUIT_DEFINE_TPL = '''
 
 '''
 
+def send_circuits_to_calibrate(ids, port):
+    while len(ids) < 6:
+        ids.append(0)
+    for id in ids:
+        port.serial.write('{}'.format(id))
+        sleep(0.01)
 
 def write_header_file(calibration, fname):
     with open(fname+'.tmp', 'w') as fout:
@@ -107,39 +114,43 @@ if __name__ == "__main__":
     else:
         print 'Nothing to be done. Please use -h to see help.'  
         quit()
+
     port = SerialTransport()
     port.open(settings)
     pfname = './board_calibration_data/pickled_board_{}'.format(board_number)
     fname = './board_calibration_data/pivy_{}.h'.format(board_number)
 
+    send_circuits_to_calibrate(list_of_ids, port)
+
     check_file_for_pickle(pfname)     
     calibration = read_pickled_data(pfname)
 
     for circuit_id in list_of_ids:
-        calibration[circuit_id] = {}
-        print('\n\nCalibrating circuit number  {}'.format(circuit_id))
-        print('Measuring offset, disconnect V and I, and press any key')
-        raw_input('')
-        write_char(port)
-        v_offset, i_offset = read_calibration_package(port, '<HH')
-        print('v_offset = {}, i_offset = {}\n'.format(v_offset, i_offset))
-        calibration[circuit_id]['v_offset'] = v_offset
-        calibration[circuit_id]['i_offset'] = i_offset
+        if circuit_id > 0 and circuit_id < 7:
+            calibration[circuit_id] = {}
+            print('\n\nCalibrating circuit number  {}'.format(circuit_id))
+            print('Measuring offset, disconnect V and I, and press any key')
+            raw_input('')
+            write_char(port)
+            v_offset, i_offset = read_calibration_package(port, '<HH')
+            print('v_offset = {}, i_offset = {}\n'.format(v_offset, i_offset))
+            calibration[circuit_id]['v_offset'] = v_offset
+            calibration[circuit_id]['i_offset'] = i_offset
 
-        print('Measuring gain, connect V and I, and press any key')
-        raw_input('')
-        write_char(port)
-        v_rms2, i_rms2 = read_calibration_package(port, '<II')
-        print('v_rms2 = {}, i_rms2 = {}\n'.format(v_rms2, i_rms2))
-        try:
-            calibration[circuit_id]['v_gain'] = V_RMS / ((v_rms2**.5) / (1 << 12))
-            calibration[circuit_id]['i_gain'] = I_RMS / ((i_rms2**.5) / (1 << 12))
-        except:
-            print ('Error, vrms = 0 or irms = 0')
-            calibration[circuit_id]['v_gain'] = 1 
-            calibration[circuit_id]['i_gain'] = 1
-        delay = ask_for_number('Insert the delay for V channel [us]: ')
-        calibration[circuit_id]['delay'] = int(float(delay) * 4) 
+            print('Measuring gain, connect V and I, and press any key')
+            raw_input('')
+            write_char(port)
+            v_rms2, i_rms2 = read_calibration_package(port, '<II')
+            print('v_rms2 = {}, i_rms2 = {}\n'.format(v_rms2, i_rms2))
+            try:
+                calibration[circuit_id]['v_gain'] = V_RMS / ((v_rms2**.5) / (1 << 12))
+                calibration[circuit_id]['i_gain'] = I_RMS / ((i_rms2**.5) / (1 << 12))
+            except:
+                print ('Error, vrms = 0 or irms = 0')
+                calibration[circuit_id]['v_gain'] = 1 
+                calibration[circuit_id]['i_gain'] = 1
+            delay = ask_for_number('Insert the delay for V channel [us]: ')
+            calibration[circuit_id]['delay'] = int(float(delay) * 4) 
     print 'calibration-> ' , calibration
     write_pickled_data(calibration, pfname)
     write_header_file(calibration, fname)

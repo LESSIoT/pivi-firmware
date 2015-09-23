@@ -65,8 +65,9 @@ void measure_I_sample(void)
 
 void measure(circuit_t *circuit)
 {
-  if (ioport_get_value(circuit->ct_detector_pin))
-    { 
+//  if (ioport_get_value(circuit->ct_detector_pin))
+     if (1)
+     { 
         measurement_packet_t packet;
 
         I_samples_count = 0; V_samples_count = 0;

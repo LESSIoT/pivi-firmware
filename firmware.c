@@ -109,14 +109,13 @@ int main(void)
      *  - Medir y promediar el canal de corriente
      *  - enviar resultados
      */
-    for(circuit_idx=0; circuit_idx<6; circuit_idx++)
+    for(circuit_idx=0; circuit_idx<N_CIRCUITS; circuit_idx++)
     {
         circuits_to_cal[circuit_idx] =(int)getchar_from_pi() - '0';
     }
 
-    debug_to_pi("cargo cosas");
 
-    for(circuit_idx=0; circuit_idx<N_CIRCUITS && circuits_to_cal[circuit_idx]>0 && circuits_to_cal[circuit_idx] < 7; circuit_idx++)
+    for(circuit_idx=0; circuit_idx<N_CIRCUITS && circuits_to_cal[circuit_idx]>0 && circuits_to_cal[circuit_idx] < N_CIRCUITS; circuit_idx++)
     {   
             getchar_from_pi();
             analog_config(&CIRCUITS[circuits_to_cal[circuit_idx]]);

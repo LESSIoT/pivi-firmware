@@ -65,11 +65,10 @@ void measure_I_sample(void)
 
 void measure(circuit_t *circuit)
 {
-//  if (ioport_get_value(circuit->ct_detector_pin))
-     if (1)
-     { 
+    if (ioport_get_value(circuit->ct_detector_pin))
+    { 
         measurement_packet_t packet;
-
+        
         I_samples_count = 0; V_samples_count = 0;
         I_rms_acc = 0; V_rms_acc = 0; power_acc = 0;
 
@@ -85,11 +84,10 @@ void measure(circuit_t *circuit)
         // wait until all the samples are taken 
         while (measuring);
         packet.circuit_id = circuit->circuit_id;
-
         packet.real_power = (power_acc / N_SAMPLES);
         packet.irms = (I_rms_acc / N_SAMPLES);
-        //sprintf(buf,"\n irms = %f \n",I_rms_acc);
-        //debug_to_pi(buf);
+        sprintf(buf,"\n irms = %i \n",(int)I_rms_acc); //debug only
+        debug_to_pi(buf);
         packet.vrms = (V_rms_acc / N_SAMPLES);
         send_to_pi(&packet);
     }  

@@ -111,7 +111,7 @@ int main(void)
      */
     for(circuit_idx=0; circuit_idx<N_CIRCUITS; circuit_idx++)
     {
-        circuits_to_cal[circuit_idx] =(int)getchar_from_pi() - '0';
+        circuits_to_cal[circuit_idx] =((int)getchar_from_pi() - '0') - 1 ;
     }
 
 

@@ -115,7 +115,7 @@ int main(void)
     }
 
 
-    for(circuit_idx=0; circuit_idx<N_CIRCUITS && circuits_to_cal[circuit_idx]>0 && circuits_to_cal[circuit_idx] < N_CIRCUITS; circuit_idx++)
+    for(circuit_idx=0; circuit_idx<N_CIRCUITS && circuits_to_cal[circuit_idx]>=0 && circuits_to_cal[circuit_idx] < N_CIRCUITS; circuit_idx++)
     {   
             getchar_from_pi();
             analog_config(&CIRCUITS[circuits_to_cal[circuit_idx]]);

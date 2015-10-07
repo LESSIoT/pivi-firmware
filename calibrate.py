@@ -16,7 +16,7 @@ settings = {'port': '/dev/ttyUSB0',
             'timeout': 10000}
 
 V_RMS = 220
-I_RMS = 10
+I_RMS = 3 
 
 
 def read_calibration_package(port, struct_str):
@@ -133,7 +133,7 @@ if __name__ == "__main__":
             raw_input('')
             write_char(port)
             v_offset, i_offset = read_calibration_package(port, '<HH')
-            print('v_offset = {}, i_offset = {}\n'.format(v_offset, i_offset))
+            print('v_offset = {}, i_offset = {} (promedios)\n'.format(v_offset, i_offset))
             calibration[circuit_id]['v_offset'] = v_offset
             calibration[circuit_id]['i_offset'] = i_offset
 
@@ -141,14 +141,15 @@ if __name__ == "__main__":
             raw_input('')
             write_char(port)
             v_rms2, i_rms2 = read_calibration_package(port, '<II')
-            print('v_rms2 = {}, i_rms2 = {}\n'.format(v_rms2, i_rms2))
             try:
                 calibration[circuit_id]['v_gain'] = V_RMS / ((v_rms2**.5) / (1 << 12))
                 calibration[circuit_id]['i_gain'] = I_RMS / ((i_rms2**.5) / (1 << 12))
+                print 'v_rms2 {} i_rms2 {} \nvgain {} igain {} \n'.format(calibration[circuit_id]['v_gain'],calibration[circuit_id]['i_gain'],v_rms_2,i_rms2)
             except:
                 print ('Error, vrms = 0 or irms = 0')
                 calibration[circuit_id]['v_gain'] = 1 
                 calibration[circuit_id]['i_gain'] = 1
+                print 'v_rms2 {} i_rms2 {} \n'.format(v_rms2,i_rms2)
             delay = ask_for_number('Insert the delay for V channel [us]: ')
             calibration[circuit_id]['delay'] = int(float(delay) * 4) 
     print 'calibration-> ' , calibration

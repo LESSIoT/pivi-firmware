@@ -52,7 +52,7 @@ volatile float analog_get_I_sample(void)
     return _circuit->I_gain * (signed_measure / (float) (1<<12));
 }
 
-#define OVERSAMPLING_FACTOR 8
+#define OVERSAMPLING_FACTOR 10 
 volatile uint16_t analog_get_V_sample_calibration(void)
 {
     uint32_t sum = 0;
@@ -88,7 +88,7 @@ volatile uint16_t analog_get_I_sample_calibration(void)
     return (uint16_t) sum;
 }
 
-#define N_MEASURES_1_SEC 166666
+#define N_MEASURES_1_SEC 400000
 volatile uint16_t analog_get_I_rms_sample_calibration(uint16_t i_mean)
 {
     uint32_t sum = 0, i;
@@ -108,8 +108,7 @@ volatile uint16_t analog_get_I_rms_sample_calibration(uint16_t i_mean)
 volatile uint16_t analog_get_V_rms_sample_calibration(uint16_t v_mean)
 {
     uint32_t sum = 0, i;
-    uint16_t measure;
-    float v_no_mean;
+    uint16_t measure, v_no_mean;
 
     // 1 segundo
     for (i = 0; i < N_MEASURES_1_SEC; i++) {

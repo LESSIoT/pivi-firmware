@@ -15,9 +15,11 @@
 #include "sysclk.h"
 #include "asf.h"
 #include "board_calibration.h"
-
+#include <stdio.h>
 #define N_CIRCUITS 6
 
+#define SIZE 80 //only for debug
+char buf3[SIZE];
 circuit_t CIRCUITS[] = {
         { .circuit_id = 1,
           .V_adc = &ADCA, .V_pin = ADCCH_POS_PIN7,
@@ -90,13 +92,13 @@ circuit_t CIRCUITS[] = {
 int main(void)
 {
     uint8_t circuit_idx = 0;
-    int circuits_to_cal[5];
-    volatile uint16_t v_mean, i_mean, v_gain_rms2, i_gain_rms2;
+    int i,circuits_to_cal[N_CIRCUITS];
+    volatile uint32_t v_mean, i_mean, v_gain_rms2, i_gain_rms2;
+    float m_for_calibration = 0.0;
     board_init();
     sysclk_init();
     communication_init();
     time_init();
-
      /*
      *  V_Offset, I_offset, tension y corriente 0
      *  - esperar sart desde la PC
@@ -109,24 +111,31 @@ int main(void)
      *  - Medir y promediar el canal de corriente
      *  - enviar resultados
      */
+
     for(circuit_idx=0; circuit_idx<N_CIRCUITS; circuit_idx++)
     {
-        circuits_to_cal[circuit_idx] =((int)getchar_from_pi() - '0') - 1 ;
+        circuits_to_cal[circuit_idx] = (((int)getchar_from_pi() - '0') - 1);
     }
 
 
-    for(circuit_idx=0; circuit_idx<N_CIRCUITS && circuits_to_cal[circuit_idx]>=0 && circuits_to_cal[circuit_idx] < N_CIRCUITS; circuit_idx++)
+    for(circuit_idx=0; circuit_idx < N_CIRCUITS && circuits_to_cal[circuit_idx] < N_CIRCUITS; circuit_idx++)
     {   
             getchar_from_pi();
+
             analog_config(&CIRCUITS[circuits_to_cal[circuit_idx]]);
             v_mean = analog_get_V_sample_calibration();
             i_mean = analog_get_I_sample_calibration();
             send_to_pi_mean_calibration(v_mean, i_mean);
 
             getchar_from_pi();
-            v_gain_rms2 = analog_get_V_rms_sample_calibration(v_mean);
+            sprintf(buf3,"\n  circuit_idx= %d , circuits_to_cal[circuit_idx] = %d \n",circuit_idx,circuits_to_cal[circuit_idx]); //debug only
+            debug_to_pi(buf3);
+            m_for_calibration = measure_for_calibration(&CIRCUITS[circuits_to_cal[circuit_idx]]);            
+
+            //v_gain_rms2 = analog_get_V_rms_sample_calibration(v_mean);
             i_gain_rms2 = analog_get_I_rms_sample_calibration(i_mean);
-            send_to_pi_gain_calibration(v_gain_rms2, i_gain_rms2);
+            send_to_pi_gain_calibration(m_for_calibration, i_gain_rms2);
+            //send_to_pi_measure_for_calibration(m_for_calibration);
     }
 }
 #else

@@ -89,10 +89,10 @@ volatile uint16_t analog_get_I_sample_calibration(void)
 }
 
 #define N_MEASURES_1_SEC 400000
-volatile uint16_t analog_get_I_rms_sample_calibration(uint16_t i_mean)
+volatile uint32_t analog_get_I_rms_sample_calibration(uint32_t i_mean)
 {
     uint32_t sum = 0, i;
-    uint16_t measure;
+    uint32_t measure;
 
     // 1 segundo
     for (i = 0; i < N_MEASURES_1_SEC; i++) {
@@ -103,13 +103,14 @@ volatile uint16_t analog_get_I_rms_sample_calibration(uint16_t i_mean)
     }
 
     // Compute sample mean by scaling down according to oversampling factor.
-    return (uint16_t) (sum / N_MEASURES_1_SEC);
+    return (uint32_t) (sum / N_MEASURES_1_SEC);
 }
-volatile uint16_t analog_get_V_rms_sample_calibration(uint16_t v_mean)
+
+
+volatile uint32_t analog_get_V_rms_sample_calibration(uint32_t v_mean)
 {
     uint32_t sum = 0, i;
-    uint16_t measure, v_no_mean;
-
+    uint32_t measure, v_no_mean ;
     // 1 segundo
     for (i = 0; i < N_MEASURES_1_SEC; i++) {
         adc_start_conversion(_circuit->V_adc, V_ADC_CH);
@@ -120,7 +121,7 @@ volatile uint16_t analog_get_V_rms_sample_calibration(uint16_t v_mean)
     }
 
     // Compute sample mean by scaling down according to oversampling factor.
-    return (uint16_t) (sum / N_MEASURES_1_SEC);
+    return (uint32_t) (sum / N_MEASURES_1_SEC);
 }
 void _channel_config(ADC_t *adc, enum adcch_positive_input pin, uint8_t ch_mask, enum adc_reference adc_ref)
 {

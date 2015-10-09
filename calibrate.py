@@ -41,7 +41,7 @@ CIRCUIT_DEFINE_TPL = '''
 
 def send_circuits_to_calibrate(ids, port):
     while len(ids) < 6:
-        ids.append(0)
+        ids.append(9)
     for id in ids:
         port.serial.write('{}'.format(id))
         sleep(0.01)
@@ -92,6 +92,7 @@ def check_file_for_pickle(fname):
 
 if __name__ == "__main__":
 
+    reference = 2.65 
     parser = argparse.ArgumentParser(description='Select the board and circuits to calibrate.')
     parser.add_argument('-b', dest= 'board_c', help= 'Number of board to calibrate.')
     parser.add_argument('-c', dest ='circuits', metavar='N',  type=int, nargs='+',
@@ -133,7 +134,7 @@ if __name__ == "__main__":
             raw_input('')
             write_char(port)
             v_offset, i_offset = read_calibration_package(port, '<HH')
-            print('v_offset = {}, i_offset = {} (promedios)\n'.format(v_offset, i_offset))
+            print('v_offset = {} -> {} V , i_offset = {}-> {} V \n'.format(v_offset, v_offset*reference/4096,i_offset,i_offset*reference/4096))
             calibration[circuit_id]['v_offset'] = v_offset
             calibration[circuit_id]['i_offset'] = i_offset
 
@@ -141,15 +142,15 @@ if __name__ == "__main__":
             raw_input('')
             write_char(port)
             v_rms2, i_rms2 = read_calibration_package(port, '<II')
+            print 'v_rms2 {} V , i_rms2 {} V \n'.format(v_rms2,i_rms2)
             try:
-                calibration[circuit_id]['v_gain'] = V_RMS / ((v_rms2**.5) / (1 << 12))
-                calibration[circuit_id]['i_gain'] = I_RMS / ((i_rms2**.5) / (1 << 12))
-                print 'v_rms2 {} i_rms2 {} \nvgain {} igain {} \n'.format(calibration[circuit_id]['v_gain'],calibration[circuit_id]['i_gain'],v_rms_2,i_rms2)
-            except:
-                print ('Error, vrms = 0 or irms = 0')
+                calibration[circuit_id]['v_gain'] = V_RMS / v_rms2
+                calibration[circuit_id]['i_gain'] = I_RMS / i_rms2
+                print 'v_gain {} i_gain {} \n'.format(calibration[circuit_id]['v_gain'],calibration[circuit_id]['i_gain'])
+            except ZeroDivisionError as e:
+                print  e
                 calibration[circuit_id]['v_gain'] = 1 
                 calibration[circuit_id]['i_gain'] = 1
-                print 'v_rms2 {} i_rms2 {} \n'.format(v_rms2,i_rms2)
             delay = ask_for_number('Insert the delay for V channel [us]: ')
             calibration[circuit_id]['delay'] = int(float(delay) * 4) 
     print 'calibration-> ' , calibration

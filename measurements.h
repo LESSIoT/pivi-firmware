@@ -13,6 +13,7 @@
 #include "firmware.h"
 
 void measure(circuit_t *circuit);
+float measure_for_calibration(circuit_t *circuit);
 
 #define N_SAMPLES_BY_PERIOD 80
 #define I_SAMPLES_BUFF_SIZE (N_SAMPLES_BY_PERIOD / 10)

@@ -16,8 +16,8 @@ settings = {'port': '/dev/ttyUSB0',
             'baudrate': 115200,
             'timeout': 10000}
 
-V_RMS = 220
-I_RMS = 3 
+V_RMS = 220.0
+I_RMS = 3.0 
 
 
 def read_calibration_package(port, struct_str):
@@ -97,14 +97,16 @@ def check_file_for_pickle(fname):
 
 if __name__ == "__main__":
 
-    reference = 2.65 #external voltage reference 
+    reference = 2.65 #External voltage reference for AD conversions 
     parser = argparse.ArgumentParser(description='Select the board and circuits to calibrate.')
     parser.add_argument('-b', dest= 'board_c', help= 'Number of board to calibrate.')
+    parser.add_argument('-v', dest= 'V_RMS', help= 'VRMS for Gain calculation')
     parser.add_argument('-c', dest ='circuits', metavar='N',  type=int, nargs='+',
                        help='IDs of circuits to calibrate. (1 to 6)')
     parser.add_argument('--all', dest='board',
                        help='Calibrate all circuits in the selected board.')
     args = parser.parse_args()
+    V_RMS = float(args.V_RMS)
     if args.circuits and args.board_c >= 1:
         for i in args.circuits:
             if not i in range(1,7):
@@ -160,7 +162,7 @@ if __name__ == "__main__":
 
             print ('v_ac2_offset = {}, i_ac2_offset = {}\n\n'.format(v_ac2_offset,i_ac2_offset))
             
-            print('Measuring gain, connect circuits to 220 V and 3 A ,then press a key \n')
+            print('Measuring gain, connect circuits to VRMS = {} V and 3 A ,then press a key \n'.format(V_RMS))
             raw_input('')
             write_char(port)
 

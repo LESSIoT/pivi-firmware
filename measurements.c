@@ -86,8 +86,8 @@ void measure(circuit_t *circuit)
         while (measuring);
         packet.circuit_id = circuit->circuit_id;
         packet.real_power = (power_acc / N_SAMPLES);
-        packet.irms = abs((I_rms_acc / N_SAMPLES));// - circuit->I_ac_offset);
-        packet.vrms = abs( (V_rms_acc / N_SAMPLES));// - circuit->V_ac_offset);
+        packet.irms = fabs((I_rms_acc / N_SAMPLES));// - circuit->I_ac_offset);
+        packet.vrms = fabs( (V_rms_acc / N_SAMPLES));// - circuit->V_ac_offset);
         send_to_pi(&packet);
     }  
 }
@@ -124,8 +124,8 @@ void measure_for_calibration(circuit_t *circuit, float* v_sample, float* i_sampl
         i_sum_measure += packet.irms;
               
     }
-   *v_sample = abs((v_sum_measure/repeat_measure) - circuit->V_ac_offset);   
-   *i_sample = abs((i_sum_measure/repeat_measure) - circuit->I_ac_offset);
+   *v_sample = fabs((v_sum_measure/repeat_measure) - circuit->V_ac_offset);   
+   *i_sample = fabs((i_sum_measure/repeat_measure) - circuit->I_ac_offset);
 }
 
 

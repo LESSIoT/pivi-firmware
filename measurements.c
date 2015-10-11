@@ -22,8 +22,8 @@ volatile float I_samples_buffer[I_SAMPLES_BUFF_SIZE];
 volatile uint16_t I_samples_count, V_samples_count;
 volatile float I_rms_acc, V_rms_acc, power_acc;
 volatile uint8_t measuring;
-int i=0;
-float sum_measure = 0;
+float v_sum_measure = 0, i_sum_measure = 0;
+int i = 0;
 
 /* internal functions prototypes */
 void measure_V_sample(void);
@@ -86,31 +86,25 @@ void measure(circuit_t *circuit)
         while (measuring);
         packet.circuit_id = circuit->circuit_id;
         packet.real_power = (power_acc / N_SAMPLES);
-        packet.irms = (I_rms_acc / N_SAMPLES);
-        //sprintf(buf,"\n irms = %i \n",(int)I_rms_acc); //debug only
-        // debug_to_pi(buf);
-        packet.vrms = (V_rms_acc / N_SAMPLES);
+        packet.irms = abs((I_rms_acc / N_SAMPLES) - circuit->I_ac_offset);
+        packet.vrms = abs( (V_rms_acc / N_SAMPLES) - circuit->V_ac_offset);
         send_to_pi(&packet);
-        //dtostrf(circuit->V_gain,7,4,buf);
-        //sprintf(buf2,"\n  circuit id = %d, Voffset %d, Vgain = %s \n",packet.circuit_id, circuit->V_dc_offset,buf); //debug only
-        //dtostrf(packet.vrms, 7, 4, buf);
-        //debug_to_pi(buf2);
-        //debug_to_pi(buf);
     }  
 }
 
 
-float measure_for_calibration(circuit_t *circuit)
+void measure_for_calibration(circuit_t *circuit, float* v_sample, float* i_sample)
 {   
     float repeat_measure = 3.0; 
-    sum_measure = 0.0;
+    v_sum_measure = 0.0;
+    i_sum_measure = 0.0;
+
     for(i=0;i<repeat_measure;i++)
     {
         measurement_packet_t packet;
         
         I_samples_count = 0; V_samples_count = 0;
         I_rms_acc = 0; V_rms_acc = 0; power_acc = 0;
-
 
         analog_config(circuit);
         
@@ -125,17 +119,13 @@ float measure_for_calibration(circuit_t *circuit)
         while (measuring);
         packet.circuit_id = circuit->circuit_id;
         packet.irms = (I_rms_acc / N_SAMPLES);
-        packet.vrms =(V_rms_acc / N_SAMPLES);
-        sum_measure += packet.vrms;
-        //dtostrf(circuit->V_gain,7,4,buf);
-        //sprintf(buf2,"\n  circuit id = %d, Voffset %d, Vgain = %s \n",packet.circuit_id, circuit->V_dc_offset,buf); //debug only
-        //dtostrf(packet.vrms, 7, 4, buf);
-        //debug_to_pi(buf2);
-        //debug_to_pi(buf);
+        packet.vrms = (V_rms_acc / N_SAMPLES);
+        v_sum_measure += packet.vrms;
+        i_sum_measure += packet.irms;
+              
     }
-    //dtostrf((sum_measure/repeat_measure),7,4,buf);
-    //debug_to_pi(buf);
-    return(sum_measure/repeat_measure);   
+   *v_sample = (v_sum_measure/repeat_measure);   
+   *i_sample = (i_sum_measure/repeat_measure);
 }
 
 

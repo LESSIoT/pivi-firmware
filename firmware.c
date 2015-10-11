@@ -19,7 +19,7 @@
 #define N_CIRCUITS 6
 
 #define SIZE 80 //only for debug
-char buf[SIZE],buf2[SIZE];
+char buf1[SIZE],buf2[SIZE];
 
 circuit_t CIRCUITS[] = {
         { .circuit_id = 1,
@@ -100,8 +100,8 @@ int main(void)
 {
     uint8_t circuit_idx = 0;
     int i,circuits_to_cal[N_CIRCUITS];
-    volatile uint32_t v_mean, i_mean, v_gain_rms2, i_gain_rms2;
-    float v_measure_for_calibration = 0.0 , v_ac_offset = 0.0;
+    volatile uint32_t v_mean, i_mean;
+    float v_measure=  0.0, i_measure = 0.0;
     board_init();
     sysclk_init();
     communication_init();
@@ -140,34 +140,19 @@ int main(void)
             CIRCUITS[circuits_to_cal[circuit_idx]].I_gain=100;
 
             send_to_pi_mean_calibration(v_mean, i_mean);
-
-            getchar_from_pi(); // se mide offset AC
-
-            v_ac_offset = measure_for_calibration(&CIRCUITS[circuits_to_cal[circuit_idx]]);
             
-            dtostrf(v_ac_offset, 7, 4, buf);
-            //sprintf(buf2,"circuit_idx= %d , circuits_to_cal[circuit_idx] = %d, m_for_cal = %s \n",circuit_idx,circuits_to_cal[circuit_idx],buf);
-            debug_to_pi(buf);
+            for(i=0;i<3;i++)
+            {    
+                getchar_from_pi(); // se mide offset AC, luego se toma 220 para calcular gain, luego medicion de pruebas
 
-            getchar_from_pi(); // se conecta 220 
-
-            v_measure_for_calibration = measure_for_calibration(&CIRCUITS[circuits_to_cal[circuit_idx]]);
-
-            dtostrf(v_measure_for_calibration, 7, 4, buf);
-
-            debug_to_pi(buf);
+                measure_for_calibration(&CIRCUITS[circuits_to_cal[circuit_idx]],&v_measure,&i_measure);
             
-            //comienza medicion de prueba
-            
-            getchar_from_pi();
-            
-            v_measure_for_calibration = measure_for_calibration(&CIRCUITS[circuits_to_cal[circuit_idx]]);
+                dtostrf(v_measure, 7, 4, buf1);
+                dtostrf(i_measure, 7, 4, buf2);
 
-            dtostrf(v_measure_for_calibration, 7, 4, buf);
-
-            debug_to_pi(buf);         
-
-
+                debug_to_pi(buf1);
+                debug_to_pi(buf2);
+            }
     }
 }
 #else

@@ -4,6 +4,7 @@
 # Copyright (C) 2014, 2015 LESS Industries S.A.
 # Author: Diego Mascialino <dmascialino@gmail.com>
 
+from math import fabs
 from time import sleep
 import os
 import struct
@@ -36,8 +37,8 @@ CIRCUIT_DEFINE_TPL = '''
 #define C{0}_V_GAIN {1[v_gain]}
 #define C{0}_I_GAIN {1[i_gain]}
 #define C{0}_DELAY {1[delay]}
-#define C{0}_VAC_OFFSET {1[v_ac_offset]}
-#define C{0}_IAC_OFFSET {1[i_ac_offset]}
+#define C{0}_VAC_OFFSET {1[v_ac2_offset]}
+#define C{0}_IAC_OFFSET {1[i_ac2_offset]}
 
 '''
 
@@ -84,8 +85,8 @@ def check_file_for_pickle(fname):
             calibration[circuit_id]={}
             calibration[circuit_id]['v_offset'] = 0
             calibration[circuit_id]['i_offset'] = 0
-            calibration[circuit_id]['v_ac_offset'] = 0
-            calibration[circuit_id]['i_ac_offset'] = 0
+            calibration[circuit_id]['v_ac2_offset'] = 0
+            calibration[circuit_id]['i_ac2_offset'] = 0
             calibration[circuit_id]['v_gain'] = 1 
             calibration[circuit_id]['i_gain'] = 1 
             calibration[circuit_id]['delay'] = 1 
@@ -148,11 +149,14 @@ if __name__ == "__main__":
             raw_input('')
             write_char(port)
             
-            v_ac_offset = float(port.serial.readline())**0.5
-            i_ac_offset = 1
+            v_ac2_offset = float(port.serial.readline())
+            v_ac_offset = v_ac2_offset**0.5
 
-            calibration[circuit_id]['v_ac_offset'] = v_ac_offset
-            calibration[circuit_id]['i_ac_offset'] = i_ac_offset
+            i_ac2_offset = float(port.serial.readline()) 
+            i_ac_offset = i_ac2_offset**0.5
+
+            calibration[circuit_id]['v_ac2_offset'] = v_ac2_offset
+            calibration[circuit_id]['i_ac2_offset'] = i_ac2_offset
 
             print ('v_ac_offset = {}, i_ac_offset = {}\n\n'.format(v_ac_offset,i_ac_offset))
             
@@ -160,12 +164,14 @@ if __name__ == "__main__":
             raw_input('')
             write_char(port)
 
-            v_rms = float(port.serial.readline())**0.5
-            i_rms = 1
+            v_rms2 = float(port.serial.readline())
+            v_rms = v_rms2**0.5
+            i_rms2 = float(port.serial.readline())
+            i_rms = v_rms2**0.5
 
             try:
-                calibration[circuit_id]['v_gain'] = (V_RMS / (v_rms - v_ac_offset))*100
-                calibration[circuit_id]['i_gain'] = (I_RMS / i_rms)*100
+                calibration[circuit_id]['v_gain'] = (V_RMS / fabs((v_rms - v_ac_offset)))*100
+                calibration[circuit_id]['i_gain'] = (I_RMS / fabs((i_rms - i_ac_offset)))*100
                 print 'v_gain {} i_gain {} \n'.format(calibration[circuit_id]['v_gain'],calibration[circuit_id]['i_gain'])
             except ZeroDivisionError as e:
                 print  e
@@ -178,10 +184,11 @@ if __name__ == "__main__":
             raw_input('')
             write_char(port)
             
-            v_rms = float(port.serial.readline())**0.5
-            v_rms = (v_rms - calibration[circuit_id]['v_ac_offset'])*calibration[circuit_id]['v_gain']
-            
-            print 'VRMS = {} V'.format(v_rms/100.0)
+            v_rms2 = float(port.serial.readline())
+            v_rms = (fabs(v_rms2 - calibration[circuit_id]['v_ac2_offset'])**0.5)*calibration[circuit_id]['v_gain']        
+            i_rms2 = float(port.serial.readline())
+            i_rms = (fabs(i_rms2 - calibration[circuit_id]['i_ac2_offset'])**0.5)*calibration[circuit_id]['i_gain']
+            print 'Vrms = {} V, Irms = {}'.format(v_rms/100.0,i_rms/100.0)
 
     print 'calibration-> ' , calibration
     write_pickled_data(calibration, pfname)

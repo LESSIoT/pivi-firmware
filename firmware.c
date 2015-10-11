@@ -101,7 +101,7 @@ int main(void)
     uint8_t circuit_idx = 0;
     int i,circuits_to_cal[N_CIRCUITS];
     volatile uint32_t v_mean, i_mean;
-    float v_measure=  0.0, i_measure = 0.0;
+    float v_measure = 0.0, i_measure = 0.0;
     board_init();
     sysclk_init();
     communication_init();
@@ -138,15 +138,23 @@ int main(void)
             CIRCUITS[circuits_to_cal[circuit_idx]].I_dc_offset=i_mean;
             CIRCUITS[circuits_to_cal[circuit_idx]].V_gain=100;
             CIRCUITS[circuits_to_cal[circuit_idx]].I_gain=100;
-
+            CIRCUITS[circuits_to_cal[circuit_idx]].V_ac_offset= 0.0;
+            CIRCUITS[circuits_to_cal[circuit_idx]].I_ac_offset= 0.0;
+            
             send_to_pi_mean_calibration(v_mean, i_mean);
             
             for(i=0;i<3;i++)
             {    
                 getchar_from_pi(); // se mide offset AC, luego se toma 220 para calcular gain, luego medicion de pruebas
-
+                
                 measure_for_calibration(&CIRCUITS[circuits_to_cal[circuit_idx]],&v_measure,&i_measure);
-            
+                
+                if(i==0)
+                {
+                    CIRCUITS[circuits_to_cal[circuit_idx]].V_ac_offset = v_measure;
+                    CIRCUITS[circuits_to_cal[circuit_idx]].I_ac_offset = i_measure;
+                }
+
                 dtostrf(v_measure, 7, 4, buf1);
                 dtostrf(i_measure, 7, 4, buf2);
 

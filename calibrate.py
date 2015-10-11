@@ -158,20 +158,20 @@ if __name__ == "__main__":
             calibration[circuit_id]['v_ac2_offset'] = v_ac2_offset
             calibration[circuit_id]['i_ac2_offset'] = i_ac2_offset
 
-            print ('v_ac_offset = {}, i_ac_offset = {}\n\n'.format(v_ac_offset,i_ac_offset))
+            print ('v_ac2_offset = {}, i_ac2_offset = {}\n\n'.format(v_ac2_offset,i_ac2_offset))
             
             print('Measuring gain, connect circuits to 220 V and 3 A ,then press a key \n')
             raw_input('')
             write_char(port)
 
-            v_rms2 = float(port.serial.readline())
+            v_rms2 = float(port.serial.readline()) #en el firmware i=0 , se mide vrms2 incluyendo ac_offsets
             v_rms = v_rms2**0.5
             i_rms2 = float(port.serial.readline())
             i_rms = v_rms2**0.5
 
             try:
-                calibration[circuit_id]['v_gain'] = (V_RMS / fabs((v_rms - v_ac_offset)))*100
-                calibration[circuit_id]['i_gain'] = (I_RMS / fabs((i_rms - i_ac_offset)))*100
+                calibration[circuit_id]['v_gain'] = (V_RMS / (v_rms2)**0.5)*100
+                calibration[circuit_id]['i_gain'] = (I_RMS / 1)*100
                 print 'v_gain {} i_gain {} \n'.format(calibration[circuit_id]['v_gain'],calibration[circuit_id]['i_gain'])
             except ZeroDivisionError as e:
                 print  e
@@ -185,10 +185,10 @@ if __name__ == "__main__":
             write_char(port)
             
             v_rms2 = float(port.serial.readline())
-            v_rms = (fabs(v_rms2 - calibration[circuit_id]['v_ac2_offset'])**0.5)*calibration[circuit_id]['v_gain']        
+            v_rms = ((v_rms2)**0.5)*calibration[circuit_id]['v_gain']        
             i_rms2 = float(port.serial.readline())
-            i_rms = (fabs(i_rms2 - calibration[circuit_id]['i_ac2_offset'])**0.5)*calibration[circuit_id]['i_gain']
-            print 'Vrms = {} V, Irms = {}'.format(v_rms/100.0,i_rms/100.0)
+            i_rms = ((i_rms2)**0.5)*calibration[circuit_id]['i_gain']
+            print 'Vrms = {} V, Irms = {}\n'.format(v_rms/100,i_rms/100)
 
     print 'calibration-> ' , calibration
     write_pickled_data(calibration, pfname)

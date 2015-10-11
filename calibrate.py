@@ -164,7 +164,7 @@ if __name__ == "__main__":
             i_rms = 1
 
             try:
-                calibration[circuit_id]['v_gain'] = (V_RMS / v_rms)*100
+                calibration[circuit_id]['v_gain'] = (V_RMS / (v_rms - v_ac_offset))*100
                 calibration[circuit_id]['i_gain'] = (I_RMS / i_rms)*100
                 print 'v_gain {} i_gain {} \n'.format(calibration[circuit_id]['v_gain'],calibration[circuit_id]['i_gain'])
             except ZeroDivisionError as e:
@@ -178,7 +178,8 @@ if __name__ == "__main__":
             raw_input('')
             write_char(port)
             
-            v_rms = (float(port.serial.readline())**0.5 - calibration[circuit_id]['v_ac_offset'])*calibration[circuit_id]['v_gain']
+            v_rms = float(port.serial.readline())**0.5
+            v_rms = (v_rms - calibration[circuit_id]['v_ac_offset'])*calibration[circuit_id]['v_gain']
             
             print 'VRMS = {} V'.format(v_rms/100.0)
 

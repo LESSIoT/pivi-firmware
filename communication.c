@@ -82,7 +82,7 @@ void send_to_pi_measure_for_calibration(const float m_for_calibration)
     usart_putchar(USART_SERIAL, SERIAL_STOP_BYTE);
 }
 
-void send_to_pi_gain_calibration(const float v_measure, const uint32_t i_measure)
+void send_to_pi_gain_calibration(const uint32_t v_measure, const uint32_t i_measure)
 {
     usart_putchar(USART_SERIAL, SERIAL_START_BYTE);
     // struct.unpack('<II', bin)

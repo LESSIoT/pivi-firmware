@@ -88,12 +88,14 @@ void measure(circuit_t *circuit)
         packet.real_power = (power_acc / N_SAMPLES);
         packet.irms = (I_rms_acc / N_SAMPLES);
         //sprintf(buf,"\n irms = %i \n",(int)I_rms_acc); //debug only
-        debug_to_pi(buf);
+        // debug_to_pi(buf);
         packet.vrms = (V_rms_acc / N_SAMPLES);
         send_to_pi(&packet);
-
-        dtostrf(packet.vrms, 7, 4, buf);
-        debug_to_pi(buf);
+        //dtostrf(circuit->V_gain,7,4,buf);
+        //sprintf(buf2,"\n  circuit id = %d, Voffset %d, Vgain = %s \n",packet.circuit_id, circuit->V_dc_offset,buf); //debug only
+        //dtostrf(packet.vrms, 7, 4, buf);
+        //debug_to_pi(buf2);
+        //debug_to_pi(buf);
     }  
 }
 
@@ -123,16 +125,16 @@ float measure_for_calibration(circuit_t *circuit)
         while (measuring);
         packet.circuit_id = circuit->circuit_id;
         packet.irms = (I_rms_acc / N_SAMPLES);
-
         packet.vrms =(V_rms_acc / N_SAMPLES);
         sum_measure += packet.vrms;
-        dtostrf(packet.vrms, 7, 4, buf);
-        sprintf(buf2,"\n  circuit id = %d \n",packet.circuit_id); //debug only
-        debug_to_pi(buf2);
-        debug_to_pi(buf);
+        //dtostrf(circuit->V_gain,7,4,buf);
+        //sprintf(buf2,"\n  circuit id = %d, Voffset %d, Vgain = %s \n",packet.circuit_id, circuit->V_dc_offset,buf); //debug only
+        //dtostrf(packet.vrms, 7, 4, buf);
+        //debug_to_pi(buf2);
+        //debug_to_pi(buf);
     }
-    dtostrf((sum_measure/repeat_measure),7,4,buf);
-    debug_to_pi(buf);
+    //dtostrf((sum_measure/repeat_measure),7,4,buf);
+    //debug_to_pi(buf);
     return(sum_measure/repeat_measure);   
 }
 

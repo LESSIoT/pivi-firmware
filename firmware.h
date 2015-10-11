@@ -23,6 +23,8 @@ typedef struct {
     enum adcch_positive_input I_pin;
     uint16_t V_dc_offset;
     uint16_t I_dc_offset;
+    float V_ac_offset;
+    float I_ac_offset;
     float V_gain; /* 1/Att of voltage circuit */
     float I_gain;
     uint16_t delay; /* delay of the voltage filter */

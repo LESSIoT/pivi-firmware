@@ -19,12 +19,14 @@
 #define N_CIRCUITS 6
 
 #define SIZE 80 //only for debug
-char buf3[SIZE];
+char buf[SIZE],buf2[SIZE];
+
 circuit_t CIRCUITS[] = {
         { .circuit_id = 1,
           .V_adc = &ADCA, .V_pin = ADCCH_POS_PIN7,
           .I_adc = &ADCA, .I_pin = ADCCH_POS_PIN1,
           .V_dc_offset = C1_V_OFFSET, .I_dc_offset = C1_I_OFFSET,
+          .V_ac_offset = C1_VAC_OFFSET, .I_ac_offset = C1_IAC_OFFSET,
           .V_gain = C1_V_GAIN, .I_gain = C1_I_GAIN,
           .delay = C1_DELAY,
           .ct_detector_pin = CT1_DETECTOR,      
@@ -35,6 +37,7 @@ circuit_t CIRCUITS[] = {
           .V_adc = &ADCA, .V_pin = ADCCH_POS_PIN7,
           .I_adc = &ADCA, .I_pin = ADCCH_POS_PIN2,
           .V_dc_offset = C2_V_OFFSET, .I_dc_offset = C2_I_OFFSET,
+          .V_ac_offset = C2_VAC_OFFSET, .I_ac_offset = C2_IAC_OFFSET,
           .V_gain = C2_V_GAIN, .I_gain = C2_I_GAIN,
           .delay = C2_DELAY,
           .ct_detector_pin = CT2_DETECTOR,
@@ -45,6 +48,7 @@ circuit_t CIRCUITS[] = {
           .V_adc = &ADCB, .V_pin = ADCCH_POS_PIN1,
           .I_adc = &ADCA, .I_pin = ADCCH_POS_PIN3,
           .V_dc_offset = C3_V_OFFSET, .I_dc_offset = C3_I_OFFSET,
+          .V_ac_offset = C3_VAC_OFFSET, .I_ac_offset = C3_IAC_OFFSET,
           .V_gain = C3_V_GAIN, .I_gain = C3_I_GAIN,
           .delay = C3_DELAY,
           .ct_detector_pin = CT3_DETECTOR,
@@ -56,6 +60,7 @@ circuit_t CIRCUITS[] = {
           .V_adc = &ADCB, .V_pin = ADCCH_POS_PIN1,
           .I_adc = &ADCA, .I_pin = ADCCH_POS_PIN4,
           .V_dc_offset = C4_V_OFFSET, .I_dc_offset = C4_I_OFFSET,
+          .V_ac_offset = C4_VAC_OFFSET, .I_ac_offset = C4_IAC_OFFSET,
           .V_gain = C4_V_GAIN, .I_gain = C4_I_GAIN,
           .delay = C4_DELAY,
           .ct_detector_pin = CT4_DETECTOR,
@@ -66,6 +71,7 @@ circuit_t CIRCUITS[] = {
           .V_adc = &ADCB, .V_pin = ADCCH_POS_PIN2,
           .I_adc = &ADCA, .I_pin = ADCCH_POS_PIN5,
           .V_dc_offset = C5_V_OFFSET, .I_dc_offset = C5_I_OFFSET,
+          .V_ac_offset = C5_VAC_OFFSET, .I_ac_offset = C5_IAC_OFFSET,
           .V_gain = C5_V_GAIN, .I_gain = C5_I_GAIN,
           .delay = C5_DELAY,
           .ct_detector_pin = CT5_DETECTOR,
@@ -76,6 +82,7 @@ circuit_t CIRCUITS[] = {
           .V_adc = &ADCB, .V_pin = ADCCH_POS_PIN2,
           .I_adc = &ADCA, .I_pin = ADCCH_POS_PIN6,
           .V_dc_offset = C6_V_OFFSET, .I_dc_offset = C6_I_OFFSET,
+          .V_ac_offset = C6_VAC_OFFSET, .I_ac_offset = C6_IAC_OFFSET,
           .V_gain = C6_V_GAIN, .I_gain = C6_I_GAIN,
           .delay = C6_DELAY,
           .ct_detector_pin = CT6_DETECTOR,
@@ -87,14 +94,14 @@ circuit_t CIRCUITS[] = {
 
 #ifdef FIRMWARE_FOR_CALIBRATION
 #include "analog.h"
-
+#include <math.h>
 
 int main(void)
 {
     uint8_t circuit_idx = 0;
     int i,circuits_to_cal[N_CIRCUITS];
     volatile uint32_t v_mean, i_mean, v_gain_rms2, i_gain_rms2;
-    float m_for_calibration = 0.0;
+    float v_measure_for_calibration = 0.0 , v_ac_offset = 0.0;
     board_init();
     sysclk_init();
     communication_init();
@@ -123,19 +130,44 @@ int main(void)
             getchar_from_pi();
 
             analog_config(&CIRCUITS[circuits_to_cal[circuit_idx]]);
+            
             v_mean = analog_get_V_sample_calibration();
             i_mean = analog_get_I_sample_calibration();
+            
+            CIRCUITS[circuits_to_cal[circuit_idx]].V_dc_offset=v_mean;
+            CIRCUITS[circuits_to_cal[circuit_idx]].I_dc_offset=i_mean;
+            CIRCUITS[circuits_to_cal[circuit_idx]].V_gain=100;
+            CIRCUITS[circuits_to_cal[circuit_idx]].I_gain=100;
+
             send_to_pi_mean_calibration(v_mean, i_mean);
 
-            getchar_from_pi();
-            sprintf(buf3,"\n  circuit_idx= %d , circuits_to_cal[circuit_idx] = %d \n",circuit_idx,circuits_to_cal[circuit_idx]); //debug only
-            debug_to_pi(buf3);
-            m_for_calibration = measure_for_calibration(&CIRCUITS[circuits_to_cal[circuit_idx]]);            
+            getchar_from_pi(); // se mide offset AC
 
-            //v_gain_rms2 = analog_get_V_rms_sample_calibration(v_mean);
-            i_gain_rms2 = analog_get_I_rms_sample_calibration(i_mean);
-            send_to_pi_gain_calibration(m_for_calibration, i_gain_rms2);
-            //send_to_pi_measure_for_calibration(m_for_calibration);
+            v_ac_offset = measure_for_calibration(&CIRCUITS[circuits_to_cal[circuit_idx]]);
+            
+            dtostrf(v_ac_offset, 7, 4, buf);
+            //sprintf(buf2,"circuit_idx= %d , circuits_to_cal[circuit_idx] = %d, m_for_cal = %s \n",circuit_idx,circuits_to_cal[circuit_idx],buf);
+            debug_to_pi(buf);
+
+            getchar_from_pi(); // se conecta 220 
+
+            v_measure_for_calibration = measure_for_calibration(&CIRCUITS[circuits_to_cal[circuit_idx]]);
+
+            dtostrf(v_measure_for_calibration, 7, 4, buf);
+
+            debug_to_pi(buf);
+            
+            //comienza medicion de prueba
+            
+            getchar_from_pi();
+            
+            v_measure_for_calibration = measure_for_calibration(&CIRCUITS[circuits_to_cal[circuit_idx]]);
+
+            dtostrf(v_measure_for_calibration, 7, 4, buf);
+
+            debug_to_pi(buf);         
+
+
     }
 }
 #else

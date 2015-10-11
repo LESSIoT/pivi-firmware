@@ -36,6 +36,8 @@ CIRCUIT_DEFINE_TPL = '''
 #define C{0}_V_GAIN {1[v_gain]}
 #define C{0}_I_GAIN {1[i_gain]}
 #define C{0}_DELAY {1[delay]}
+#define C{0}_VAC_OFFSET {1[v_ac_offset]}
+#define C{0}_IAC_OFFSET {1[i_ac_offset]}
 
 '''
 
@@ -81,10 +83,12 @@ def check_file_for_pickle(fname):
         for circuit_id in range(1,7):
             calibration[circuit_id]={}
             calibration[circuit_id]['v_offset'] = 0
-            calibration[circuit_id]['i_offset'] = 0 
-            calibration[circuit_id]['v_gain'] = 0
-            calibration[circuit_id]['i_gain'] = 0 
-            calibration[circuit_id]['delay'] = 0 
+            calibration[circuit_id]['i_offset'] = 0
+            calibration[circuit_id]['v_ac_offset'] = 0
+            calibration[circuit_id]['i_ac_offset'] = 0
+            calibration[circuit_id]['v_gain'] = 1 
+            calibration[circuit_id]['i_gain'] = 1 
+            calibration[circuit_id]['delay'] = 1 
         write_pickled_data(calibration, fname)
     else:
         pass
@@ -92,7 +96,7 @@ def check_file_for_pickle(fname):
 
 if __name__ == "__main__":
 
-    reference = 2.65 
+    reference = 2.65 #external voltage reference 
     parser = argparse.ArgumentParser(description='Select the board and circuits to calibrate.')
     parser.add_argument('-b', dest= 'board_c', help= 'Number of board to calibrate.')
     parser.add_argument('-c', dest ='circuits', metavar='N',  type=int, nargs='+',
@@ -118,6 +122,7 @@ if __name__ == "__main__":
 
     port = SerialTransport()
     port.open(settings)
+    
     pfname = './board_calibration_data/pickled_board_{}'.format(board_number)
     fname = './board_calibration_data/pivy_{}.h'.format(board_number)
 
@@ -134,18 +139,33 @@ if __name__ == "__main__":
             raw_input('')
             write_char(port)
             v_offset, i_offset = read_calibration_package(port, '<HH')
+            
             print('v_offset = {} -> {} V , i_offset = {}-> {} V \n'.format(v_offset, v_offset*reference/4096,i_offset,i_offset*reference/4096))
             calibration[circuit_id]['v_offset'] = v_offset
             calibration[circuit_id]['i_offset'] = i_offset
 
-            print('Measuring gain, connect V and I, and press any key')
+            print('Measuring AC offsets, press any key')
             raw_input('')
             write_char(port)
-            v_rms2, i_rms2 = read_calibration_package(port, '<II')
-            print 'v_rms2 {} V , i_rms2 {} V \n'.format(v_rms2,i_rms2)
+            
+            v_ac_offset = float(port.serial.readline())**0.5
+            i_ac_offset = 1
+
+            calibration[circuit_id]['v_ac_offset'] = v_ac_offset
+            calibration[circuit_id]['i_ac_offset'] = i_ac_offset
+
+            print ('v_ac_offset = {}, i_ac_offset = {}\n\n'.format(v_ac_offset,i_ac_offset))
+            
+            print('Measuring gain, connect circuits to 220 V and 3 A ,then press a key \n')
+            raw_input('')
+            write_char(port)
+
+            v_rms = float(port.serial.readline())**0.5
+            i_rms = 1
+
             try:
-                calibration[circuit_id]['v_gain'] = V_RMS / v_rms2
-                calibration[circuit_id]['i_gain'] = I_RMS / i_rms2
+                calibration[circuit_id]['v_gain'] = (V_RMS / v_rms)*100
+                calibration[circuit_id]['i_gain'] = (I_RMS / i_rms)*100
                 print 'v_gain {} i_gain {} \n'.format(calibration[circuit_id]['v_gain'],calibration[circuit_id]['i_gain'])
             except ZeroDivisionError as e:
                 print  e
@@ -153,6 +173,15 @@ if __name__ == "__main__":
                 calibration[circuit_id]['i_gain'] = 1
             delay = ask_for_number('Insert the delay for V channel [us]: ')
             calibration[circuit_id]['delay'] = int(float(delay) * 4) 
+
+            print('\n ------------------------------------ \n \nTest measure using offsets and gain, press a key \n')
+            raw_input('')
+            write_char(port)
+            
+            v_rms = (float(port.serial.readline())**0.5 - calibration[circuit_id]['v_ac_offset'])*calibration[circuit_id]['v_gain']
+            
+            print 'VRMS = {} V'.format(v_rms/100.0)
+
     print 'calibration-> ' , calibration
     write_pickled_data(calibration, pfname)
     write_header_file(calibration, fname)

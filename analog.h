@@ -24,6 +24,4 @@ volatile float analog_get_I_sample(void);
 volatile uint16_t analog_get_I_sample_calibration(void);
 volatile uint16_t analog_get_V_sample_calibration(void);
 
-volatile uint32_t analog_get_I_rms_sample_calibration(uint32_t i_mean);
-volatile uint32_t analog_get_V_rms_sample_calibration(uint32_t i_mean);
 #endif /* _ANALOG_H */

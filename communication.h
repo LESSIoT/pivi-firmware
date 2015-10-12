@@ -20,10 +20,8 @@ typedef struct measurement_packet {
 
 void communication_init(void);
 void send_to_pi(const measurement_packet_t *packet);
-
 void send_to_pi_mean_calibration(const uint16_t v_measure, const uint16_t i_measure);
-void send_to_pi_gain_calibration(const uint32_t v_measure, const uint32_t i_measure);
-void send_to_pi_measure_for_calibration(const float meaure_for_calibration);
+
 /* Debug functions */
 uint8_t getchar_from_pi(void);
 void debug_to_pi(const char *c);

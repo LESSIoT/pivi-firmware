@@ -100,12 +100,14 @@ if __name__ == "__main__":
     reference = 2.65 #External voltage reference for AD conversions 
     parser = argparse.ArgumentParser(description='Select the board and circuits to calibrate.')
     parser.add_argument('-b', dest= 'board_c', help= 'Number of board to calibrate.')
-    parser.add_argument('-v', dest= 'V_RMS', help= 'VRMS for Gain calculation')
+    parser.add_argument('-v', dest= 'V_RMS', help= 'VRMS for Gain calculation.')
+    parser.add_argument('-i', dest= 'I_RMS', help= 'IRMS for Gain calculation.')
     parser.add_argument('-c', dest ='circuits', metavar='N',  type=int, nargs='+',
                        help='IDs of circuits to calibrate. (1 to 6)')
     parser.add_argument('--all', dest='board',
                        help='Calibrate all circuits in the selected board.')
     args = parser.parse_args()
+    I_RMS = float(args.I_RMS)
     V_RMS = float(args.V_RMS)
     if args.circuits and args.board_c >= 1:
         for i in args.circuits:
@@ -162,7 +164,7 @@ if __name__ == "__main__":
 
             print ('v_ac2_offset = {}, i_ac2_offset = {}\n\n'.format(v_ac2_offset,i_ac2_offset))
             
-            print('Measuring gain, connect circuits to VRMS = {} V and 3 A ,then press a key \n'.format(V_RMS))
+            print('Measuring gain, connect circuits to VRMS = {} V and IRMS = {} A, then press a key \n'.format(V_RMS,I_RMS))
             raw_input('')
             write_char(port)
 
@@ -173,7 +175,7 @@ if __name__ == "__main__":
 
             try:
                 calibration[circuit_id]['v_gain'] = (V_RMS / (v_rms2)**0.5)*100
-                calibration[circuit_id]['i_gain'] = (I_RMS / 1)*100
+                calibration[circuit_id]['i_gain'] = (I_RMS / (i_rms2)**0.5)*100
                 print 'v_gain {} i_gain {} \n'.format(calibration[circuit_id]['v_gain'],calibration[circuit_id]['i_gain'])
             except ZeroDivisionError as e:
                 print  e

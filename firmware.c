@@ -145,7 +145,7 @@ int main(void)
             
             for(i=0;i<3;i++)
             {    
-                getchar_from_pi(); // se mide offset AC, luego se toma 220 para calcular gain, luego medicion de pruebas
+                getchar_from_pi(); //se mide offset AC, luego se toma 220 para calcular gain, luego medicion de pruebas
                 
                 measure_for_calibration(&CIRCUITS[circuits_to_cal[circuit_idx]],&v_measure,&i_measure);
                 
@@ -158,7 +158,7 @@ int main(void)
                 dtostrf(v_measure, 7, 4, buf1);
                 dtostrf(i_measure, 7, 4, buf2);
 
-                debug_to_pi(buf1);
+                debug_to_pi(buf1); //TODO Replace this function with a proper one like send_to_pi_mean_calibration()
                 debug_to_pi(buf2);
             }
     }

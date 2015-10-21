@@ -12,7 +12,8 @@
 #define _FIRMWARE_H
 
 #include <stdint.h>
-#include <adc.h>
+#include <asf.h>
+
 
 typedef struct {
     uint8_t circuit_id;
@@ -22,9 +23,14 @@ typedef struct {
     enum adcch_positive_input I_pin;
     uint16_t V_dc_offset;
     uint16_t I_dc_offset;
+    float V_ac_offset;
+    float I_ac_offset;
     float V_gain; /* 1/Att of voltage circuit */
     float I_gain;
     uint16_t delay; /* delay of the voltage filter */
+    port_pin_t ct_detector_pin;
+    enum adc_reference I_ref;
+    enum adc_reference V_ref;
 } circuit_t;
 
 #endif /* _FIRMWARE_H */
